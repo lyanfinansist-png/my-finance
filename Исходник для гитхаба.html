@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Моя система — Доход, Капитал, Цели</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1e222b; --text:#e8eaed;
+    --muted:#9aa0aa; --accent:#4f8cff; --line:#2a2f3a;
+    --purple:#a78bfa; --gold:#fbbf24;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+    background:var(--bg);color:var(--text);padding:20px; -webkit-text-size-adjust: 100%;}
+  .wrap{max-width:1200px;margin:0 auto}
+  
+  .main-nav { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 12px; overflow-x: auto;}
+  .main-tab { font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: 0.2s; text-align: center; flex: 1; white-space: nowrap;}
+  .main-tab:hover { color: var(--text); background: var(--card2); }
+  .main-tab.active { color: #fff; background: var(--accent); }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+  .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  
+  input[type=number], input[type=text], select {width:100%;background:#0b0d11;border:1px solid var(--line);
+    border-radius:10px;padding:10px 12px;color:var(--text);font-size:16px; outline: none; margin-top: 4px;}
+  input:focus, select:focus {border-color:var(--accent);}
+
+  /* УБИРАЕМ СТРЕЛОЧКИ (СПИННЕРЫ) */
+  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+  
+  .tabs{display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; margin-bottom:16px; padding-bottom: 4px;}
+  .tab{background:var(--card2); border:1px solid var(--line); border-radius:8px; padding:8px 12px; 
+    font-size:12px; font-weight:600; cursor:pointer; color:var(--muted); transition:.15s;
+    display:flex; flex-direction:column; gap:2px; align-items:center; white-space: nowrap;}
+  .tab:hover{border-color:var(--accent); color:var(--text);}
+  .tab.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .tab .tab-main{font-size:13px;}
+  .tab .tab-sub{font-size:10px; opacity:.8; font-weight:500;}
+
+  .top-stats{display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:16px;}
+  .stat-card{background:var(--card2); border:1px solid var(--line); border-radius:12px; padding:14px; transition: 0.3s;}
+  .stat-val{font-size:20px; font-weight:700; margin-top:4px;}
+  
+  .calendar-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; }
+
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
+  .day{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:6px;min-height:70px;
+    display:flex;flex-direction:column;gap:4px; transition: 0.3s; position: relative;}
+  .day .dnum{font-size:10px;color:var(--muted);display:flex;justify-content:space-between}
+  .day input.amount {width:100%;background:#0b0d11;border:1px solid var(--line);border-radius:6px;
+    padding:4px;color:var(--text);font-size:12px;text-align:right}
+  
+  /* Календарь Плана */
+  .day select.plan-select {width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px; padding:2px; color:var(--gold); font-size:10px; outline:none; margin-bottom:2px; -webkit-appearance:none; text-overflow:ellipsis;}
+  .day select.plan-select option {background: var(--card2); color: var(--text);}
+  .day input.plan-amount {width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px; padding:4px; color:var(--gold); font-size:12px; text-align:right; outline:none;}
+
+  .note-icon { position: absolute; top: 4px; right: 4px; font-size: 10px; cursor: pointer; color: var(--accent); }
+
+  .bar{height:12px;background:#0b0d11;border-radius:99px;margin-top:12px;overflow:hidden}
+  .bar>div{height:100%;background:linear-gradient(90deg, #4f8cff 0%, #38bdf8 40%, #37d67a 100%);border-radius:99px;transition:width .35s; box-shadow: 0 0 10px rgba(55, 214, 122, 0.4);}
+  
+  .progress-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
+  .progress-pct { font-size:36px; font-weight: 800; letter-spacing: -1px; line-height: 1; color: var(--text); }
+  .progress-meta { text-align: right; font-size: 12px; color: var(--muted); }
+  .progress-meta b { color: var(--text); }
+  
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  
+  .year-nav-tiles { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
+  .year-tile { background: var(--card2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; 
+    font-size: 16px; font-weight: 700; color: var(--muted); cursor: pointer; transition: 0.4s; text-align: center; min-width: 70px;}
+  .year-tile.active { border: 2px solid var(--accent); color: var(--text); box-shadow: 0 0 10px rgba(79, 140, 255, 0.4); }
+
+  .nav-btn{background:var(--card2); border:1px solid var(--line); border-radius:8px; padding:6px 12px;
+    cursor:pointer; color:var(--text); font-weight:600; transition:.15s; font-size: 14px;}
+  .nav-btn:hover{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .month-title{font-size:16px; font-weight:650; text-transform:capitalize;}
+
+  .month-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .tile { background: #0b0d11; border: 1px solid var(--line); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.4s; min-height: 70px; position: relative;}
+  .tile-name { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #fff; opacity: 0.7; margin-bottom: 2px; }
+  .tile-sum { font-size: 13px; font-weight: 700; color: #fff; }
+  .tile-pct { font-size: 9px; margin-top: 2px; color: #fff; opacity: 0.8; font-weight: bold;}
+  
+  .tile.active { border: 2px solid var(--accent); box-shadow: 0 0 12px rgba(79, 140, 255, 0.5); transform: scale(1.05); }
+  
+  .status-dark-red { background: linear-gradient(135deg, #7f1d1d, #991b1b, #b91c1c); border-color: #ef4444; }
+  .status-light-red { background: linear-gradient(135deg, #b91c1c, #dc2626, #ef4444); border-color: #f87171; }
+  .status-yellow { background: linear-gradient(135deg, #b45309, #d97706, #f59e0b); border-color: #fbbf24; }
+  .status-light-green { background: linear-gradient(135deg, #4d7c0f, #65a30d, #84cc16); border-color: #a3e635; }
+  
+  .status-green { 
+    background: linear-gradient(135deg, #15803d, #16a34a, #22c55e); 
+    border: 2px solid #86efac; 
+    box-shadow: 0 0 15px rgba(134, 239, 172, 0.8), 0 0 30px rgba(34, 197, 94, 0.5), inset 0 0 10px rgba(134, 239, 172, 0.3); 
+    animation: pulseGlow 2s infinite alternate;
+  }
+
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 15px rgba(134, 239, 172, 0.6), 0 0 30px rgba(34, 197, 94, 0.3); border-color: #4ade80; }
+    100% { box-shadow: 0 0 25px rgba(134, 239, 172, 1), 0 0 50px rgba(34, 197, 94, 0.8); border-color: #bbf7d0; }
+  }
+
+  /* Золотая подсветка */
+  .golden-match {
+    border: 2px solid var(--gold) !important;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.6), inset 0 0 10px rgba(251, 191, 36, 0.2) !important;
+    animation: goldPulse 1.5s infinite alternate;
+    transform: scale(1.02);
+  }
+
+  @keyframes goldPulse {
+    0% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); border-color: #fcd34d; }
+    100% { box-shadow: 0 0 25px rgba(251, 191, 36, 0.9); border-color: #fef08a; }
+  }
+
+  .day.day-green { background: rgba(55, 214, 122, 0.15); border-color: #22c55e; box-shadow: inset 0 0 8px rgba(55, 214, 122, 0.2); }
+  .day.day-yellow { background: rgba(251, 191, 36, 0.15); border-color: #d97706; }
+  .day.day-red { background: rgba(239, 68, 68, 0.15); border-color: #ef4444; }
+  
+  .status-red-text { color: #ef4444 !important; }
+  .status-yellow-text { color: #fbbf24 !important; }
+  .status-light-text { color: #a3e635 !important; }
+  .status-green-text { color: #37d67a !important; font-weight: bold; }
+
+  .forecast-box { margin-top: 16px; padding: 12px; background: rgba(79, 140, 255, 0.1); border: 1px solid rgba(79, 140, 255, 0.3); border-radius: 10px; font-size: 14px; line-height: 1.5; }
+  .forecast-box b { color: var(--accent); }
+  .forecast-box .highlight { color: #37d67a; font-weight: bold; }
+
+  .levels-table { margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+  .lvl-item { background: rgba(255,255,255,0.03); border: 1px solid var(--line); padding: 8px; border-radius: 8px; text-align: center; }
+  .lvl-item.active { border-color: var(--accent); background: rgba(79, 140, 255, 0.1); }
+  .lvl-title { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .lvl-val { font-size: 13px; font-weight: 700; color: var(--text); }
+
+  .quarters-block { margin-top: 20px; padding: 16px; background: rgba(255,255,255,0.02); border: 1px dashed var(--line); border-radius: 12px; }
+  .quarters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+  .q-tile { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 12px; text-align: center; transition: 0.4s; }
+  .q-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .q-pct { font-size: 18px; font-weight: 800; }
+  .q-info { font-size: 10px; color: var(--muted); margin-top: 4px; }
+  
+  .hint-box { margin-top: 12px; padding: 10px; border-radius: 8px; text-align: center; font-weight: 600; font-size: 14px; }
+
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
+  .modal.active { display: flex; }
+  .modal-content { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; width: 90%; max-width: 400px; }
+  .modal-content h3 { margin-top: 0; }
+  .modal-content select, .modal-content input, .modal-content textarea { margin-bottom: 12px; width: 100%; background: #0b0d11; border: 1px solid var(--line); border-radius: 8px; padding: 10px; color: var(--text); font-family: inherit; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
+  .btn-cancel { background: transparent; border: 1px solid var(--line); color: var(--text); padding: 8px 16px; border-radius: 8px; cursor: pointer;}
+  .btn-save { background: var(--accent); border: none; color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold;}
+
+  .obj-list { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .obj-tag { background: var(--card2); border: 1px solid var(--line); padding: 6px 12px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 8px; }
+  .obj-del { background: rgba(239,68,68,0.2); border: none; color: #ef4444; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;}
+
+  /* ========== СТИЛИ ДЛЯ ЦЕЛЕЙ ========== */
+  .dreams-list { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+  
+  .dream-card { background: var(--card2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; position: relative; overflow: hidden; transition: all 0.4s ease; }
+
+  .dream-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; position: relative; z-index: 2; }
+  
+  .dream-title { font-size: 18px; font-weight: 700; text-transform: capitalize; color: #fff; display: flex; align-items: center; gap: 8px; }
+  
+  .dream-delete { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #ef4444; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px; transition: 0.2s; }
+  .dream-delete:hover { background: rgba(239,68,68,0.3); }
+
+  .dream-amounts { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; position: relative; z-index: 2; }
+
+  .dream-pct-large { font-size: 26px; font-weight: 800; background: linear-gradient(90deg, #a78bfa, #4f8cff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+
+  .dream-cost { font-size: 14px; color: var(--muted); font-weight: bold; }
+
+  .dream-bar-container { width: 100%; height: 28px; background: #0b0d11; border-radius: 14px; position: relative; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.6); margin-bottom: 16px; z-index: 2; }
+
+  .dream-bar-fill { height: 100%; background: linear-gradient(90deg, #a78bfa 0%, #818cf8 50%, #4f8cff 100%); border-radius: 14px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); position: relative; box-shadow: 0 0 10px rgba(79, 140, 255, 0.4); }
+
+  .dream-bar-fill::after { content: ''; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: shine 2.5s infinite; }
+  @keyframes shine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+  .dream-input-wrap { display: flex; align-items: center; background: #0b0d11; border: 1px solid var(--line); border-radius: 8px; padding: 4px 12px; position: relative; z-index: 2; }
+  .dream-input-wrap:focus-within { border-color: var(--accent); }
+  .dream-input-wrap span { color: var(--muted); font-size: 14px; font-weight: 600; margin-right: 8px; }
+  .dream-input { border: none !important; background: transparent !important; color: var(--accent) !important; font-weight: 800 !important; font-size: 18px !important; padding: 8px 0 !important; margin: 0 !important; text-align: right; width: 100%; }
+  .dream-input:focus { outline: none; }
+  .dream-input:disabled { color: var(--gold) !important; cursor: not-allowed; opacity: 0.8; }
+
+  .goal-complete { border-color: var(--gold) !important; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3), inset 0 0 15px rgba(251, 191, 36, 0.1) !important; }
+  .goal-complete .dream-bar-fill { background: linear-gradient(90deg, #fbbf24, #f59e0b, #fcd34d) !important; box-shadow: 0 0 15px rgba(251, 191, 36, 0.7) !important; }
+  .goal-complete .dream-pct-large { background: linear-gradient(90deg, #fbbf24, #fcd34d) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; }
+
+  /* Тумблер */
+  .switch { position: relative; display: inline-block; width: 50px; height: 28px; flex-shrink: 0;}
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #0b0d11; transition: .4s; border-radius: 28px; border: 1px solid var(--line); }
+  .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: var(--muted); transition: .4s; border-radius: 50%; }
+  input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
+  input:checked + .slider:before { transform: translateX(22px); background-color: #fff; }
+
+  @media(max-width:850px){
+    .calendar-layout { grid-template-columns: 1fr; }
+    .top-stats{grid-template-columns:1fr}
+    .quarters-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  
+  <div class="main-nav">
+    <div class="main-tab active" id="nav-income">📈 Доход</div>
+    <div class="main-tab" id="nav-capital">💰 Капитал</div>
+    <div class="main-tab" id="nav-dreams">🎯 Цели</div>
+  </div>
+
+  <!-- ВКЛАДКА 1: ДОХОД -->
+  <div class="page active" id="page-income">
+    <div class="card" id="objectManager" style="display:none; border-color: var(--gold);">
+      <div class="label" style="color: var(--gold);">Управление объектами</div>
+      <div style="display: flex; gap: 12px; margin-top: 8px;">
+        <input type="text" id="newObjName" placeholder="Название объекта" style="flex: 1;">
+        <button class="btn-save" id="addObjBtn" style="flex: 0 0 auto; background: var(--gold); color: #000;">Добавить</button>
+      </div>
+      <div class="obj-list" id="objList"></div>
+    </div>
+
+    <div class="card" id="incFactCard">
+      <div class="label" id="incFactLabel">Мой фактический доход в этом месяце</div>
+      <div class="stat-val" id="incFactSum" style="font-size: 28px;">0 ₽</div>
+      <div class="sub" id="incFactPct">0% от текущей цели</div>
+    </div>
+
+    <div class="tabs" id="incTabs"></div>
+
+    <div class="top-stats">
+      <div class="stat-card">
+        <div class="label" id="incTargetLabel">Текущая цель дохода</div>
+        <div class="stat-val" id="incTarget">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Статус месяца</div>
+        <div class="stat-val" id="incStatus" style="font-size: 16px;">—</div>
+      </div>
+    </div>
+
+    <div class="calendar-layout">
+      <div class="card">
+        <div class="year-nav-tiles" id="yearTilesInc"></div>
+        <div class="nav-row">
+          <button class="nav-btn" id="prevMonthInc">‹ Месяц</button>
+          <div class="month-title" id="monthTitleInc">Октябрь 2026</div>
+          <button class="nav-btn" id="nextMonthInc">Месяц ›</button>
+        </div>
+        <div class="cal" id="calInc"></div>
+        
+        <div class="forecast-box" id="incForecast"></div>
+        
+        <div class="label" style="margin-top:20px; margin-bottom:8px;" id="levelsLabel">Шпаргалка: план на день для других целей</div>
+        <div class="levels-table" id="incLevelsList"></div>
+
+        <div class="quarters-block" id="incQuartersBlock">
+          <div class="label">Анализ кварталов</div>
+          <div class="quarters-grid" id="incQuartersGrid"></div>
+          <div class="hint-box" id="incQuarterHint"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="label" id="tilesLabel">Карта месяцев</div>
+        <div class="month-tiles" id="monthTilesInc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ВКЛАДКА 2: КАПИТАЛ -->
+  <div class="page" id="page-capital">
+    <div class="top-stats">
+      <div class="stat-card">
+        <div class="label">Мой накопленный капитал</div>
+        <div class="stat-val" id="capGlobal">0 ₽</div>
+      </div>
+      <div class="stat-card">
+        <div class="label" id="capTermLabel">Срок: 10 лет</div>
+        <div class="stat-val" id="capPlanMonth" style="color:var(--accent)">—</div>
+      </div>
+    </div>
+
+    <div class="tabs" id="capTabs"></div>
+
+    <div class="card" style="border-color: var(--accent);">
+      <div class="progress-header">
+        <div class="progress-pct" id="capPctBig">0,00%</div>
+        <div class="progress-meta">Собрано: <b id="capPctDetails">0 ₽ из 60 млн</b></div>
+      </div>
+      <div class="bar" style="height:16px; margin-top:8px;"><div id="capBarfill" style="width:0%;"></div></div>
+    </div>
+
+    <div class="calendar-layout">
+      <div class="card">
+        <div class="year-nav-tiles" id="yearTilesCap"></div>
+        <div class="nav-row">
+          <button class="nav-btn" id="prevMonthCap">‹ Месяц</button>
+          <div class="month-title" id="monthTitleCap">Октябрь 2026</div>
+          <button class="nav-btn" id="nextMonthCap">Месяц ›</button>
+        </div>
+        <div class="cal" id="calCap"></div>
+        
+        <div class="forecast-box" id="capForecast"></div>
+        <div class="label" style="margin-top:20px; margin-bottom:8px;">Шпаргалка: план на день для разных сроков</div>
+        <div class="levels-table" id="capLevelsList"></div>
+      </div>
+
+      <div class="card">
+        <div class="label">Карта месяцев</div>
+        <div class="month-tiles" id="monthTilesCap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ВКЛАДКА 3: ЦЕЛИ -->
+  <div class="page" id="page-dreams">
+    <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin-bottom: 16px;">
+      <div>
+        <div class="label" style="margin-bottom: 4px;">Автораспределение дохода</div>
+        <div style="font-size: 12px; color: var(--muted);">Делить весь доход пропорционально стоимости целей</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="autoDistributeToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="card">
+      <div class="label">Создать новую цель</div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;">
+        <input type="text" id="dreamName" placeholder="Название (напр. Автомобиль)" style="flex: 2;">
+        <input type="number" id="dreamCost" placeholder="Стоимость, ₽" style="flex: 1;">
+        <button class="btn-save" id="addDreamBtn" style="flex: 0 0 auto; padding: 10px 20px;">Добавить</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Мои цели и накопления на них</div>
+      <div class="dreams-list" id="dreamsList"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Модальное окно для заметок -->
+<div class="modal" id="noteModal">
+  <div class="modal-content">
+    <h3>Заметка к дню <span id="modalDate"></span></h3>
+    <label class="label">Источник дохода</label>
+    <select id="noteSource">
+      <option value="Работа по объекту">Работа по объекту (сделка)</option>
+      <option value="Прибыль на материалах">Прибыль на материалах</option>
+      <option value="Дизайн-проект">Оплата за дизайн-проект</option>
+      <option value="Мебель и комплектация">Мебель и комплектация</option>
+      <option value="Другое">Другое (своё)</option>
+    </select>
+    <input type="text" id="noteCustomSource" placeholder="Своё название источника" style="display:none; margin-top: 8px;">
+    
+    <label class="label" style="margin-top: 12px;">Комментарий</label>
+    <textarea id="noteText" placeholder="Например: сдали объект на Таганке..."></textarea>
+    
+    <div class="modal-actions">
+      <button class="btn-cancel" id="noteCancel">Отмена</button>
+      <button class="btn-save" id="noteSave">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => new Intl.NumberFormat('ru-RU').format(Math.round(n));
+const money = n => fmt(n) + ' ₽';
+const shortMoney = n => {
+  if (n >= 1e6) return (n/1e6).toFixed(1).replace('.',',') + ' млн';
+  if (n >= 1e3) return Math.round(n/1e3) + 'к';
+  return fmt(n);
+};
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBn0fm1rqAH2XmxFw42SSAmE9Yx8w5WHEc",
+  authDomain: "my-finance-app-7bbbc.firebaseapp.com",
+  databaseURL: "https://my-finance-app-7bbbc-default-rtdb.firebaseio.com/",
+  projectId: "my-finance-app-7bbbc",
+  storageBucket: "my-finance-app-7bbbc.firebasestorage.app",
+  messagingSenderId: "55842593930",
+  appId: "1:55842593930:web:c6c4ab59ddb58237812173"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const syncRef = db.ref('finance_data');
+
+const GOAL_CAPITAL = 60000000;
+const TERMS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; 
+const INCOME_LEVELS = [0, 150000, 250000, 300000, 350000, 400000, 450000, 500000, 600000, 650000, 1000000];
+
+let globalData = {}, notesData = {}, dreamsData = [], objectsData = [], planData = {};
+let isWritingLocal = false, saveTimeout;
+
+function saveAll() {
+  isWritingLocal = true;
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    syncRef.set({ globalData, notesData, dreamsData, objectsData, planData }).then(() => {
+      setTimeout(() => { isWritingLocal = false; }, 1000);
+    });
+  }, 500); 
+}
+
+syncRef.on('value', (snapshot) => {
+  if (isWritingLocal) return;
+  const cloudData = snapshot.val();
+  if (cloudData) {
+    globalData = cloudData.globalData || {};
+    notesData = cloudData.notesData || {};
+    dreamsData = cloudData.dreamsData || [];
+    objectsData = cloudData.objectsData || [];
+    planData = cloudData.planData || {};
+    if (typeof updateInc === 'function') updateInc();
+    if (typeof updateCap === 'function') updateCap();
+    if (typeof renderDreams === 'function') renderDreams();
+  }
+});
+
+function getMonthKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
+function getNoteKey(y, m, d) { return y + '-' + (m+1) + '-' + d; }
+
+function getStatusClass(pct) {
+  if (pct >= 98) return 'status-green';
+  if (pct >= 75) return 'status-light-green';
+  if (pct >= 50) return 'status-yellow';
+  if (pct >= 25) return 'status-light-red';
+  if (pct > 0) return 'status-dark-red';
+  return '';
+}
+
+$('nav-income').addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); $('nav-income').classList.add('active'); $('page-income').classList.add('active'); updateInc(); });
+$('nav-capital').addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); $('nav-capital').classList.add('active'); $('page-capital').classList.add('active'); updateCap(); });
+$('nav-dreams').addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); $('nav-dreams').classList.add('active'); $('page-dreams').classList.add('active'); renderDreams(); });
+
+// ДОХОД
+let incActiveLevel = 'plan'; 
+let incViewDate = new Date(2026, 9, 1);
+
+function calculatePlanMonthTotal(y, m) {
+  const key = getMonthKey(new Date(y, m, 1));
+  const monthPlan = planData[key] || {};
+  return Object.values(monthPlan).reduce((sum, day) => sum + (day.amt || 0), 0);
+}
+
+function renderObjects() {
+  const list = $('objList'); list.innerHTML = '';
+  if (objectsData.length === 0) { list.innerHTML = '<div class="label" style="text-align:center; width:100%;">Список пуст.</div>'; return; }
+  objectsData.forEach((obj, index) => {
+    const el = document.createElement('div'); el.className = 'obj-tag';
+    el.innerHTML = `<span>${obj}</span><button class="obj-del" data-index="${index}">×</button>`;
+    list.appendChild(el);
+  });
+  document.querySelectorAll('.obj-del').forEach(btn => {
+    btn.addEventListener('click', (e) => { const idx = +e.target.dataset.index; objectsData.splice(idx, 1); saveAll(); renderObjects(); initIncCalendar(); });
+  });
+}
+
+$('addObjBtn').addEventListener('click', () => {
+  const name = $('newObjName').value.trim(); if (!name) return;
+  if (objectsData.includes(name)) { alert('Такой объект уже есть!'); return; }
+  objectsData.push(name); saveAll(); $('newObjName').value = ''; renderObjects(); initIncCalendar();
+});
+
+function renderIncTabs() {
+  const tabs = $('incTabs'); tabs.innerHTML = '';
+  const planTab = document.createElement('div'); planTab.className = 'tab' + (incActiveLevel === 'plan' ? ' active' : ''); planTab.innerHTML = `<div class="tab-main">План</div>`;
+  planTab.addEventListener('click', () => { incActiveLevel = 'plan'; updateInc(); renderIncTabs(); }); tabs.appendChild(planTab);
+
+  INCOME_LEVELS.forEach((lvl, index) => {
+    let label = index === 0 ? 'Факт' : (lvl === 1000000 ? '1 млн' : shortMoney(lvl));
+    const el = document.createElement('div'); el.className = 'tab' + (lvl === incActiveLevel ? ' active' : ''); el.innerHTML = `<div class="tab-main">${label}</div>`;
+    el.addEventListener('click', () => { incActiveLevel = lvl; updateInc(); renderIncTabs(); }); tabs.appendChild(el);
+  });
+}
+
+function renderYearTilesInc() {
+  const container = $('yearTilesInc'); container.innerHTML = '';
+  const currentYear = incViewDate.getFullYear(); const isPlanMode = incActiveLevel === 'plan';
+  for (let y = 2026; y <= 2035; y++) {
+    let yearSum = 0;
+    for (let m = 0; m < 12; m++) { yearSum += isPlanMode ? calculatePlanMonthTotal(y, m) : (globalData[getMonthKey(new Date(y, m, 1))] || []).reduce((a,b)=>a+(b||0),0); }
+    let pct = 0; if (!isPlanMode && incActiveLevel > 0) pct = (yearSum / (incActiveLevel * 12)) * 100;
+    const el = document.createElement('div'); el.className = `year-tile ${(!isPlanMode && incActiveLevel > 0) ? getStatusClass(pct) : ''} ${y === currentYear ? 'active' : ''}`; el.textContent = y;
+    el.addEventListener('click', () => { incViewDate.setFullYear(y); updateInc(); }); container.appendChild(el);
+  }
+}
+
+function initIncCalendar() {
+  const cal = $('calInc'); cal.innerHTML = '';
+  const y = incViewDate.getFullYear(), m = incViewDate.getMonth(), key = getMonthKey(incViewDate), isPlanMode = incActiveLevel === 'plan';
+  $('monthTitleInc').textContent = incViewDate.toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
+  const dows = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  dows.forEach(x=>{ const h=document.createElement('div'); h.className='label'; h.style.textAlign='center'; h.textContent=x; cal.appendChild(h); });
+  const firstDay = new Date(y, m, 1); const startDow = (firstDay.getDay() + 6) % 7; 
+  for (let i=0;i<startDow;i++){ const e=document.createElement('div'); cal.appendChild(e); }
+  const daysInMonth = new Date(y, m + 1, 0).getDate(), monthData = globalData[key] || new Array(daysInMonth).fill(0), monthPlan = planData[key] || {};
+
+  $('objectManager').style.display = isPlanMode ? 'block' : 'none';
+  if (isPlanMode) renderObjects();
+
+  for (let day=1; day<=daysInMonth; day++){
+    const el = document.createElement('div'); el.className='day';
+    const noteKey = getNoteKey(y, m, day), hasNote = notesData[noteKey] ? '📝' : '';
+
+    if (isPlanMode) {
+      const dayData = monthPlan[day-1] || { obj: '', amt: '' }; let options = '<option value="">—</option>';
+      objectsData.forEach(obj => { options += `<option value="${obj}" ${dayData.obj === obj ? 'selected' : ''}>${obj}</option>`; });
+      el.innerHTML = `<div class="dnum"><span>${day}</span><span>${dows[(new Date(y,m,day).getDay()+6)%7]}</span></div><select class="plan-select" data-day="${day-1}">${options}</select><input type="number" class="plan-amount" data-day="${day-1}" value="${dayData.amt || ''}" placeholder="0">`;
+    } else {
+      const val = monthData[day-1] ? monthData[day-1] : '';
+      el.innerHTML = `<div class="dnum"><span>${day}</span><span>${dows[(new Date(y,m,day).getDay()+6)%7]}</span></div>${hasNote ? `<div class="note-icon" data-note="${noteKey}">${hasNote}</div>` : ''}<input type="number" class="amount" data-day="${day-1}" value="${val}" placeholder="0"><div class="note" data-note="${day-1}"></div>`;
+    }
+    cal.appendChild(el);
+  }
+  
+  if (isPlanMode) {
+    cal.querySelectorAll('.plan-select').forEach(sel => { sel.addEventListener('change', (e) => { const i = +e.target.dataset.day; if (!planData[key]) planData[key] = {}; if (!planData[key][i]) planData[key][i] = { obj: '', amt: '' }; planData[key][i].obj = e.target.value; saveAll(); refreshIncStats(); }); });
+    cal.querySelectorAll('.plan-amount').forEach(inp => { inp.addEventListener('input', (e) => { const i = +e.target.dataset.day; if (!planData[key]) planData[key] = {}; if (!planData[key][i]) planData[key][i] = { obj: '', amt: '' }; planData[key][i].amt = e.target.value ? +e.target.value : 0; saveAll(); refreshIncStats(); }); });
+  } else {
+    cal.querySelectorAll('input.amount').forEach(inp=>{ inp.addEventListener('input', ()=>{ const i = +inp.dataset.day; if (!globalData[key]) globalData[key] = new Array(daysInMonth).fill(0); globalData[key][i] = inp.value ? +inp.value : 0; saveAll(); refreshIncStats(); refreshCapStats(); }); });
+    cal.querySelectorAll('.note-icon').forEach(icon => { icon.addEventListener('click', (e) => { e.stopPropagation(); openNoteModal(icon.dataset.note); }); });
+  }
+  refreshIncStats(); 
+}
+
+let currentNoteKey = null;
+function openNoteModal(key) {
+  currentNoteKey = key; const parts = key.split('-'); const d = new Date(parts[0], parts[1]-1, parts[2]);
+  $('modalDate').textContent = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+  const note = notesData[key] || {}; const sourceSelect = $('noteSource'); const customInput = $('noteCustomSource');
+  if (['Работа по объекту', 'Прибыль на материалах', 'Дизайн-проект', 'Мебель и комплектация'].includes(note.source)) { sourceSelect.value = note.source; customInput.style.display = 'none'; } else if (note.source) { sourceSelect.value = 'Другое'; customInput.value = note.source; customInput.style.display = 'block'; } else { sourceSelect.value = 'Работа по объекту'; customInput.style.display = 'none'; }
+  $('noteText').value = note.text || ''; $('noteModal').classList.add('active');
+}
+
+$('noteSource').addEventListener('change', (e) => { if (e.target.value === 'Другое') $('noteCustomSource').style.display = 'block'; else $('noteCustomSource').style.display = 'none'; });
+$('noteCancel').addEventListener('click', () => { $('noteModal').classList.remove('active'); currentNoteKey = null; });
+$('noteSave').addEventListener('click', () => {
+  if (!currentNoteKey) return; let source = $('noteSource').value; if (source === 'Другое') source = $('noteCustomSource').value.trim() || 'Другое'; const text = $('noteText').value.trim();
+  if (!text && !source) delete notesData[currentNoteKey]; else notesData[currentNoteKey] = { source, text };
+  saveAll(); $('noteModal').classList.remove('active'); currentNoteKey = null; initIncCalendar();
+});
+
+function refreshIncStats() {
+  const y = incViewDate.getFullYear(), m = incViewDate.getMonth(), key = getMonthKey(incViewDate), daysInMonth = new Date(y, m + 1, 0).getDate();
+  const monthData = globalData[key] || new Array(daysInMonth).fill(0), monthSum = monthData.reduce((a,b)=>a + (b||0), 0);
+  const planSum = calculatePlanMonthTotal(y, m), isPlanMode = incActiveLevel === 'plan', incFactCard = $('incFactCard');
+
+  if (isPlanMode) {
+    incFactCard.classList.remove('golden-match'); $('incFactLabel').textContent = 'Запланировано на этот месяц'; $('incFactSum').textContent = money(planSum); $('incFactPct').textContent = 'Режим редактирования плана';
+    $('incTargetLabel').textContent = 'Сумма плана на месяц'; $('incTarget').textContent = money(planSum); $('incStatus').textContent = 'Планирование'; $('incStatus').className = 'stat-val status-yellow-text';
+    $('incForecast').innerHTML = `Распределите ожидаемые суммы по дням.`; $('incLevelsList').innerHTML = ''; $('levelsLabel').style.display = 'none'; $('incQuartersBlock').style.display = 'none'; $('tilesLabel').textContent = 'Карта месяцев (План)';
+    renderIncTiles(); renderYearTilesInc(); return;
+  } else {
+    $('incFactLabel').textContent = 'Мой фактический доход в этом месяце'; $('incFactSum').textContent = money(monthSum); $('levelsLabel').style.display = 'block'; $('incQuartersBlock').style.display = 'block'; $('tilesLabel').textContent = 'Карта месяцев (Факт)';
+    if (planSum > 0 && Math.abs(monthSum - planSum) < 1) incFactCard.classList.add('golden-match'); else incFactCard.classList.remove('golden-match');
+  }
+
+  const planDay = incActiveLevel > 0 ? (incActiveLevel / daysInMonth) : 0;
+  for (let day=1; day<=daysInMonth; day++){
+    const inp = document.querySelector(`#calInc input[data-day="${day-1}"]`); if (!inp) continue;
+    const parent = inp.closest('.day'), note = parent.querySelector('.note'), v = monthData[day-1] || 0;
+    parent.classList.remove('day-green', 'day-yellow', 'day-red');
+    if (v > 0 && planDay > 0) { const ratio = v / planDay; if (ratio >= 0.90) parent.classList.add('day-green'); else if (ratio >= 0.50) parent.classList.add('day-yellow'); else parent.classList.add('day-red'); note.textContent = 'внесено'; } else { note.textContent = ''; }
+  }
+
+  let filledDays = 0; for (let i=0; i<daysInMonth; i++) { if (monthData[i] > 0) filledDays++; }
+  const daysLeft = daysInMonth - filledDays;
+  if (incActiveLevel === 0) {
+    $('incTargetLabel').textContent = 'Текущая цель дохода'; $('incTarget').textContent = 'Факт'; $('incFactPct').textContent = 'Режим просмотра'; $('incStatus').textContent = '—'; $('incStatus').className = 'stat-val'; $('incForecast').innerHTML = 'Цель: режим просмотра.'; $('incLevelsList').innerHTML = '';
+    renderIncTiles(); renderYearTilesInc(); renderQuarters(); return;
+  }
+  
+  const pct = (monthSum / incActiveLevel) * 100; $('incTargetLabel').textContent = 'Текущая цель дохода'; $('incTarget').textContent = money(incActiveLevel); $('incFactPct').textContent = pct.toFixed(0) + '% от цели';
+  const statusEl = $('incStatus'); if (pct >= 98) { statusEl.textContent = '🏆 MISSION COMPLETE'; statusEl.className = 'stat-val status-green-text'; } else if (pct >= 75) { statusEl.textContent = 'Почти у цели'; statusEl.className = 'stat-val status-light-text'; } else if (pct >= 50) { statusEl.textContent = 'Неплохо'; statusEl.className = 'stat-val status-yellow-text'; } else { statusEl.textContent = 'Нужно поднажать'; statusEl.className = 'stat-val status-red-text'; }
+
+  const leftToClose = incActiveLevel - monthSum;
+  if (leftToClose > 0) { const perDay = daysLeft > 0 ? (leftToClose / daysLeft) : leftToClose; $('incForecast').innerHTML = `Внесено <b>${money(monthSum)}</b> за <b>${filledDays} дн.</b> · Осталось до плана: <b>${money(leftToClose)}</b><br><span class="highlight">Нужно вносить по ${money(perDay)} / день</span> на оставшиеся ${daysLeft} дн.`; } else { $('incForecast').innerHTML = `План месяца закрыт! (${money(monthSum)} из ${money(incActiveLevel)}) 🎉`; }
+
+  let lvlHtml = ''; INCOME_LEVELS.forEach(lvl => { if (lvl === 0) return; const isActive = lvl === incActiveLevel ? 'active' : ''; const text = lvl === 1000000 ? '1 млн' : shortMoney(lvl); const left = lvl - monthSum; let perDay = 0; if (left > 0) perDay = daysLeft > 0 ? (left / daysLeft) : left; lvlHtml += `<div class="lvl-item ${isActive}"><div class="lvl-title">Цель ${text}</div><div class="lvl-val">${left > 0 ? money(perDay)+'/день' : 'Закрыто'}</div></div>`; });
+  $('incLevelsList').innerHTML = lvlHtml;
+
+  renderIncTiles(); renderYearTilesInc(); renderQuarters();
+}
+
+function renderQuarters() {
+  const grid = $('incQuartersGrid'), hint = $('incQuarterHint'); if (!grid) return; grid.innerHTML = '';
+  const y = incViewDate.getFullYear(), planQ = incActiveLevel * 3;
+  if (incActiveLevel === 0) { hint.style.display = 'none'; return; }
+  for (let q = 0; q < 4; q++) {
+    let qSum = 0; for (let i = 0; i < 3; i++) { const m = q * 3 + i; const key = getMonthKey(new Date(y, m, 1)); const monthArr = globalData[key] || []; qSum += monthArr.reduce((a,b)=>a + (b||0), 0); }
+    const pct = planQ > 0 ? (qSum / planQ) * 100 : 0;
+    const el = document.createElement('div'); el.className = `q-tile ${getStatusClass(pct)}`; el.innerHTML = `<div class="q-name">Q${q+1}</div><div class="q-pct">${pct.toFixed(0)}%</div><div class="q-info">${shortMoney(qSum)}</div>`; grid.appendChild(el);
+  }
+  let streak = 0; for (let q = 0; q < 4; q++) { let qSum = 0; for (let i = 0; i < 3; i++) { const m = q * 3 + i; const key = getMonthKey(new Date(y, m, 1)); const monthArr = globalData[key] || []; qSum += monthArr.reduce((a,b)=>a + (b||0), 0); } const pct = planQ > 0 ? (qSum / planQ) * 100 : 0; if (pct >= 98) streak++; else streak = 0; }
+  hint.style.display = 'block';
+  if (streak >= 3) { hint.style.background = 'rgba(55, 214, 122, 0.2)'; hint.style.color = '#37d67a'; hint.textContent = `🚀 Ты держишь стабильный темп ${streak} квартала подряд! Пора переходить на новый уровень дохода.`; } else if (streak === 2) { hint.style.background = 'rgba(251, 191, 36, 0.2)'; hint.style.color = '#fbbf24'; hint.textContent = `🔥 Уже 2 квартала подряд! Ещё один стабильный квартал — и можно брать новый уровень.`; } else if (streak === 1) { hint.style.background = 'rgba(79, 140, 255, 0.2)'; hint.style.color = 'var(--accent)'; hint.textContent = `✅ Один квартал закрыт. Держи темп ещё 2 квартала, чтобы уверенно перейти на новый уровень.`; } else { hint.style.background = 'rgba(255,255,255,0.05)'; hint.style.color = 'var(--muted)'; hint.textContent = `Закрой квартал (98%+), чтобы начать серию. 2-3 квартала подряд = готов к росту.`; }
+}
+
+function renderIncTiles() {
+  const container = $('monthTilesInc'); container.innerHTML = '';
+  const y = incViewDate.getFullYear(), isPlanMode = incActiveLevel === 'plan';
+  for (let m = 0; m < 12; m++) {
+    const date = new Date(y, m, 1), key = getMonthKey(date), monthName = date.toLocaleString('ru-RU', { month: 'short' }), monthArr = globalData[key] || [], monthSum = monthArr.reduce((a,b)=>a + (b||0), 0), planSum = calculatePlanMonthTotal(y, m), isActive = (y === incViewDate.getFullYear() && m === incViewDate.getMonth());
+    let pct = 0, pctText = '', displaySum = isPlanMode ? planSum : monthSum, isGolden = false;
+    if (!isPlanMode) { isGolden = planSum > 0 && Math.abs(monthSum - planSum) < 1; if (incActiveLevel > 0) { pct = (monthSum / incActiveLevel) * 100; if (pct >= 98) pctText = `🏆 DONE`; else if (pct >= 75) pctText = `75%+`; else if (pct >= 50) pctText = `50%+`; else if (monthSum > 0) pctText = `<50%`; } }
+    const el = document.createElement('div'); el.className = `tile ${(!isPlanMode && incActiveLevel > 0) ? getStatusClass(pct) : ''} ${isActive ? 'active' : ''} ${isGolden ? 'golden-match' : ''}`;
+    el.innerHTML = `<div class="tile-name">${monthName}</div><div class="tile-sum" style="${isPlanMode ? 'color:var(--gold);' : ''}">${displaySum > 0 ? shortMoney(displaySum) : '—'}</div><div class="tile-pct">${pctText}</div>`;
+    el.addEventListener('click', () => { incViewDate = new Date(y, m, 1); initIncCalendar(); renderIncTiles(); renderYearTilesInc(); }); container.appendChild(el);
+  }
+}
+
+function updateInc() { initIncCalendar(); refreshIncStats(); }
+$('prevMonthInc').addEventListener('click', () => { incViewDate.setMonth(incViewDate.getMonth() - 1); updateInc(); });
+$('nextMonthInc').addEventListener('click', () => { incViewDate.setMonth(incViewDate.getMonth() + 1); updateInc(); });
+
+// КАПИТАЛ
+let capActiveTerm = 10, capViewDate = new Date(2026, 9, 1);
+function renderCapTabs() {
+  const tabs = $('capTabs'); tabs.innerHTML = '';
+  TERMS.forEach(t => { const monthly = GOAL_CAPITAL / (t * 12); const el = document.createElement('div'); el.className = 'tab' + (t === capActiveTerm ? ' active' : ''); el.innerHTML = `<div class="tab-main">${t} лет</div><div class="tab-sub">${shortMoney(monthly)}/мес</div>`; el.addEventListener('click', () => { capActiveTerm = t; updateCap(); renderCapTabs(); }); tabs.appendChild(el); });
+}
+
+function renderYearTilesCap() {
+  const container = $('yearTilesCap'); container.innerHTML = '';
+  const currentYear = capViewDate.getFullYear(), planMonth = GOAL_CAPITAL / (capActiveTerm * 12);
+  for (let y = 2026; y <= 2035; y++) {
+    let yearSum = 0; for (let m = 0; m < 12; m++) { const key = getMonthKey(new Date(y, m, 1)); const monthArr = globalData[key] || []; yearSum += monthArr.reduce((a,b)=>a + (b||0), 0); }
+    const yearPlan = planMonth * 12; let pct = 0; if (planMonth > 0) pct = (yearSum / yearPlan) * 100;
+    const el = document.createElement('div'); el.className = `year-tile ${getStatusClass(pct)} ${y === currentYear ? 'active' : ''}`; el.textContent = y; el.addEventListener('click', () => { capViewDate.setFullYear(y); updateCap(); }); container.appendChild(el);
+  }
+}
+
+function initCapCalendar() {
+  const cal = $('calCap'); cal.innerHTML = '';
+  const y = capViewDate.getFullYear(), m = capViewDate.getMonth(), key = getMonthKey(capViewDate);
+  $('monthTitleCap').textContent = capViewDate.toLocaleString('ru-RU', { month: 'long', year: 'numeric' });
+  const dows = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  dows.forEach(x=>{ const h=document.createElement('div'); h.className='label'; h.style.textAlign='center'; h.textContent=x; cal.appendChild(h); });
+  const firstDay = new Date(y, m, 1), startDow = (firstDay.getDay() + 6) % 7; 
+  for (let i=0;i<startDow;i++){ const e=document.createElement('div'); cal.appendChild(e); }
+  const daysInMonth = new Date(y, m + 1, 0).getDate(), monthData = globalData[key] || new Array(daysInMonth).fill(0);
+  for (let day=1; day<=daysInMonth; day++){
+    const el = document.createElement('div'); el.className='day'; const val = monthData[day-1] ? monthData[day-1] : '';
+    const noteKey = getNoteKey(y, m, day), hasNote = notesData[noteKey] ? '📝' : '';
+    el.innerHTML = `<div class="dnum"><span>${day}</span><span>${dows[(new Date(y,m,day).getDay()+6)%7]}</span></div>${hasNote ? `<div class="note-icon" data-note="${noteKey}">${hasNote}</div>` : ''}<input type="number" class="amount" data-day="${day-1}" value="${val}" placeholder="0"><div class="note" data-note="${day-1}"></div>`;
+    cal.appendChild(el);
+  }
+  cal.querySelectorAll('input.amount').forEach(inp=>{ inp.addEventListener('input', ()=>{ const i = +inp.dataset.day; if (!globalData[key]) globalData[key] = new Array(daysInMonth).fill(0); globalData[key][i] = inp.value ? +inp.value : 0; saveAll(); refreshCapStats(); refreshIncStats(); }); });
+  cal.querySelectorAll('.note-icon').forEach(icon => { icon.addEventListener('click', (e) => { e.stopPropagation(); openNoteModal(icon.dataset.note); }); });
+  refreshCapStats(); 
+}
+
+function refreshCapStats() {
+  const y = capViewDate.getFullYear(), m = capViewDate.getMonth(), key = getMonthKey(capViewDate), daysInMonth = new Date(y, m + 1, 0).getDate();
+  const monthData = globalData[key] || new Array(daysInMonth).fill(0), monthSum = monthData.reduce((a,b)=>a + (b||0), 0);
+  const planMonth = GOAL_CAPITAL / (capActiveTerm * 12), planDay = planMonth / daysInMonth;
+  for (let day=1; day<=daysInMonth; day++){
+    const inp = document.querySelector(`#calCap input[data-day="${day-1}"]`); if (!inp) continue;
+    const parent = inp.closest('.day'), note = parent.querySelector('.note'), v = monthData[day-1] || 0;
+    parent.classList.remove('day-green', 'day-yellow', 'day-red');
+    if (v > 0 && planDay > 0) { const ratio = v / planDay; if (ratio >= 0.90) parent.classList.add('day-green'); else if (ratio >= 0.50) parent.classList.add('day-yellow'); else parent.classList.add('day-red'); note.textContent = 'внесено'; } else { note.textContent = ''; }
+  }
+  let filledDays = 0; for (let i=0; i<daysInMonth; i++) { if (monthData[i] > 0) filledDays++; }
+  const daysLeft = daysInMonth - filledDays, leftToClose = planMonth - monthSum;
+  if (leftToClose > 0) { const perDay = daysLeft > 0 ? (leftToClose / daysLeft) : leftToClose; $('capForecast').innerHTML = `Внесено <b>${money(monthSum)}</b> за <b>${filledDays} дн.</b> · Осталось до плана: <b>${money(leftToClose)}</b><br><span class="highlight">Нужно вносить по ${money(perDay)} / день</span> на оставшиеся ${daysLeft} дн.`; } else { $('capForecast').innerHTML = `План месяца закрыт! (${money(monthSum)} из ${money(planMonth)}) 🎉`; }
+  let lvlHtml = ''; TERMS.forEach(t => { const pm = GOAL_CAPITAL / (t * 12); const isActive = t === capActiveTerm ? 'active' : ''; const left = pm - monthSum; let perDay = 0; if (left > 0) perDay = daysLeft > 0 ? (left / daysLeft) : left; lvlHtml += `<div class="lvl-item ${isActive}"><div class="lvl-title">Срок ${t} лет</div><div class="lvl-val">${left > 0 ? money(perDay)+'/день' : 'Закрыто'}</div></div>`; });
+  $('capLevelsList').innerHTML = lvlHtml;
+  let total = 0; Object.values(globalData).forEach(monthArr => { total += monthArr.reduce((a,b)=>a + (b||0), 0); });
+  $('capGlobal').textContent = money(total); $('capTermLabel').textContent = `Срок: ${capActiveTerm} лет`; $('capPlanMonth').textContent = money(planMonth) + ' / мес';
+  const pct = total / GOAL_CAPITAL; $('capPctBig').textContent = (pct * 100).toFixed(pct < 0.01 ? 4 : 2).replace('.', ',') + '%'; $('capPctDetails').innerHTML = `<b>${money(total)}</b> из 60 млн`; $('capBarfill').style.width = Math.max(0.5, Math.min(100, pct * 100)) + '%';
+  renderCapTiles(); renderYearTilesCap();
+}
+
+function renderCapTiles() {
+  const container = $('monthTilesCap'); container.innerHTML = '';
+  const y = capViewDate.getFullYear(), planMonth = GOAL_CAPITAL / (capActiveTerm * 12);
+  for (let m = 0; m < 12; m++) {
+    const date = new Date(y, m, 1), key = getMonthKey(date), monthName = date.toLocaleString('ru-RU', { month: 'short' }), monthArr = globalData[key] || [], monthSum = monthArr.reduce((a,b)=>a + (b||0), 0), isActive = (y === capViewDate.getFullYear() && m === capViewDate.getMonth());
+    let pct = 0, pctText = ''; if (planMonth > 0) { pct = (monthSum / planMonth) * 100; if (pct >= 98) pctText = `🏆 DONE`; else if (pct >= 75) pctText = `75%+`; else if (pct >= 50) pctText = `50%+`; else if (monthSum > 0) pctText = `<50%`; }
+    const el = document.createElement('div'); el.className = `tile ${getStatusClass(pct)} ${isActive ? 'active' : ''}`;
+    el.innerHTML = `<div class="tile-name">${monthName}</div><div class="tile-sum">${monthSum > 0 ? shortMoney(monthSum) : '—'}</div><div class="tile-pct">${pctText}</div>`;
+    el.addEventListener('click', () => { capViewDate = new Date(y, m, 1); initCapCalendar(); renderCapTiles(); renderYearTilesCap(); }); container.appendChild(el);
+  }
+}
+
+function updateCap() { initCapCalendar(); refreshCapStats(); }
+$('prevMonthCap').addEventListener('click', () => { capViewDate.setMonth(capViewDate.getMonth() - 1); updateCap(); });
+$('nextMonthCap').addEventListener('click', () => { capViewDate.setMonth(capViewDate.getMonth() + 1); updateCap(); });
+
+// ЦЕЛИ
+function renderDreams() {
+  const list = $('dreamsList'); list.innerHTML = '';
+  const autoDist = localStorage.getItem('autoDistribute') === 'true'; $('autoDistributeToggle').checked = autoDist;
+  let totalIncome = 0; Object.values(globalData).forEach(monthArr => { totalIncome += monthArr.reduce((a,b)=>a + (b||0), 0); });
+  let totalCost = dreamsData.reduce((sum, d) => sum + (d.cost || 0), 0);
+  if (dreamsData.length === 0) { list.innerHTML = '<div class="label" style="text-align:center; padding: 20px;">У тебя пока нет целей. Добавь первую!</div>'; return; }
+  
+  dreamsData.forEach((dream, index) => {
+    let savedAmount = dream.saved || 0; if (autoDist && totalCost > 0) { savedAmount = (dream.cost / totalCost) * totalIncome; }
+    const pct = dream.cost > 0 ? (savedAmount / dream.cost) * 100 : 0; const visualPct = Math.min(100, pct); const isDone = pct >= 100;
+    const el = document.createElement('div'); el.className = 'dream-card' + (isDone ? ' goal-complete' : '');
+    el.innerHTML = `<div class="dream-header"><div class="dream-title">${dream.name || 'Новая цель'} ${autoDist ? '<span style="font-size:10px; color:var(--accent); border:1px solid var(--accent); padding:2px 4px; border-radius:4px; margin-left:6px; vertical-align:middle;">Авто</span>' : ''}</div><button class="dream-delete" data-index="${index}">Удалить</button></div><div class="dream-amounts"><div class="dream-pct-large">${pct.toFixed(1)}%</div><div class="dream-cost">Цель: ${shortMoney(dream.cost)} ₽</div></div><div class="dream-bar-container"><div class="dream-bar-fill" style="width: ${visualPct}%;"></div></div><div class="dream-input-wrap"><span>Отложено:</span><input type="number" class="dream-input" data-index="${index}" value="${savedAmount ? Math.round(savedAmount) : ''}" placeholder="0" ${autoDist ? 'disabled' : ''}><span>₽</span></div>`;
+    list.appendChild(el);
+  });
+
+  document.querySelectorAll('.dream-input').forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      if (localStorage.getItem('autoDistribute') === 'true') return;
+      const idx = +e.target.dataset.index; const val = e.target.value ? +e.target.value : 0; dreamsData[idx].saved = val; saveAll();
+      const card = e.target.closest('.dream-card'), cost = dreamsData[idx].cost, pct = cost > 0 ? (dreamsData[idx].saved / cost) * 100 : 0, visualPct = Math.min(100, pct);
+      card.querySelector('.dream-bar-fill').style.width = visualPct + '%'; card.querySelector('.dream-pct-large').textContent = pct.toFixed(1) + '%';
+      if (pct >= 100) card.classList.add('goal-complete'); else card.classList.remove('goal-complete');
+    });
+  });
+
+  document.querySelectorAll('.dream-delete').forEach(btn => {
+    btn.addEventListener('click', (e) => { const idx = +e.target.dataset.index; if(confirm('Удалить эту цель?')) { dreamsData.splice(idx, 1); saveAll(); renderDreams(); } });
+  });
+}
+
+$('autoDistributeToggle').addEventListener('change', (e) => { localStorage.setItem('autoDistribute', e.target.checked); renderDreams(); });
+$('addDreamBtn').addEventListener('click', () => { const name = $('dreamName').value.trim(), cost = +$('dreamCost').value; if (!name || !cost) { alert('Заполни название и стоимость!'); return; } dreamsData.push({ name, cost, saved: 0 }); saveAll(); $('dreamName').value = ''; $('dreamCost').value = ''; renderDreams(); });
+
+renderIncTabs(); initIncCalendar(); renderCapTabs(); initCapCalendar();
+</script>
+</body>
+</html>
