@@ -25,41 +25,38 @@
     -webkit-overflow-scrolling: touch; 
     -webkit-user-select: none;
     user-select: none;
+    overflow-x: hidden; /* Защита от горизонтального скролла */
   }
   
   ::-webkit-scrollbar { display: none; }
   
-  body {
-    min-height: 100vh;
-    min-height: 100dvh;
-  }
+  body { min-height: 100vh; min-height: 100dvh; }
 
   .wrap{
     max-width: 1200px;
     margin: 0 auto;
-    padding-top: calc(12px + env(safe-area-inset-top));
-    padding-bottom: calc(20px + env(safe-area-inset-bottom));
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-top: calc(8px + env(safe-area-inset-top));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    padding-left: 8px;
+    padding-right: 8px;
   }
   
-  .main-nav { display: flex; gap: 6px; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 10px; overflow-x: auto;}
-  .main-tab { font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; padding: 10px 12px; border-radius: 8px; transition: 0.2s; text-align: center; flex: 1; white-space: nowrap;}
-  .main-tab:hover { color: var(--text); background: var(--card2); }
+  .main-nav { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--line); padding-bottom: 8px; overflow-x: auto;}
+  .main-tab { font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; padding: 10px 4px; border-radius: 8px; transition: 0.2s; text-align: center; flex: 1; white-space: nowrap;}
   .main-tab.active { color: #fff; background: var(--accent); }
 
   .page { display: none; }
   .page.active { display: block; }
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
-  .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   
   input[type=number], input[type=text], select {
     width:100%;
     background:#0b0d11;
     border:1px solid var(--line);
-    border-radius:10px;
-    padding:12px;
+    border-radius:8px;
+    padding:10px;
     color:var(--text);
     font-size:16px; /* 16px предотвращает зум iOS */
     outline: none;
@@ -72,82 +69,73 @@
   input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   input[type=number] { -moz-appearance: textfield; }
   
-  .tabs{display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; margin-bottom:16px; padding-bottom: 4px; -webkit-overflow-scrolling: touch;}
-  .tab{background:var(--card2); border:1px solid var(--line); border-radius:8px; padding:10px 14px; 
-    font-size:13px; font-weight:600; cursor:pointer; color:var(--muted); transition:.15s;
+  .tabs{display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; margin-bottom:12px; padding-bottom: 4px; -webkit-overflow-scrolling: touch;}
+  .tab{background:var(--card2); border:1px solid var(--line); border-radius:6px; padding:8px 12px; 
+    font-size:12px; font-weight:600; cursor:pointer; color:var(--muted); transition:.15s;
     display:flex; flex-direction:column; gap:2px; align-items:center; white-space: nowrap;}
   .tab.active{background:var(--accent); color:#fff; border-color:var(--accent);}
-  .tab .tab-main{font-size:14px;}
-  .tab .tab-sub{font-size:10px; opacity:.8; font-weight:500;}
+  .tab .tab-main{font-size:13px;}
 
-  /* Статистика */
-  .top-stats{display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:14px;}
-  .stat-card{background:var(--card2); border:1px solid var(--line); border-radius:12px; padding:12px; transition: 0.3s;}
-  .stat-val{font-size:18px; font-weight:700; margin-top:4px;}
+  /* Статистика в 2 колонки */
+  .top-stats{display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px;}
+  .stat-card{background:var(--card2); border:1px solid var(--line); border-radius:10px; padding:10px;}
+  .stat-val{font-size:16px; font-weight:700; margin-top:2px;}
   
-  .calendar-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; }
+  .calendar-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; }
 
-  /* КАЛЕНДАРЬ - ОПТИМИЗИРОВАНО ПОД МОБИЛЬНЫЕ */
-  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:12px}
-  .day{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:4px;
-    display:flex;flex-direction:column;justify-content:space-between;gap:4px; transition: 0.3s; position: relative; min-height: 72px;}
+  /* КАЛЕНДАРЬ */
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px}
+  .day{background:var(--card2);border:1px solid var(--line);border-radius:6px;padding:2px;
+    display:flex;flex-direction:column;justify-content:space-between;gap:2px; transition: 0.3s; position: relative; min-height: 60px;}
   .day .dnum{font-size:9px;color:var(--muted);display:flex;justify-content:space-between; padding: 0 2px;}
   
-  /* Инпуты в календаре: крупные, по центру, без искажений */
+  /* Инпуты в календаре */
   .day input.amount {
-    width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:6px;
-    color:var(--text); font-size:16px; text-align:center; padding: 6px 0; height: 32px;
+    width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px;
+    color:var(--text); font-size:16px; text-align:center; padding: 4px 0; height: 26px;
   }
   
-  .day select.plan-select {width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px; color:var(--gold); font-size:16px; outline:none; height: 32px; padding: 0 2px; text-overflow: ellipsis;}
+  .day select.plan-select {width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px; color:var(--gold); font-size:14px; outline:none; height: 26px; padding: 0 2px; text-overflow: ellipsis;}
   .day select.plan-select option {background: var(--card2); color: var(--text);}
-  .day input.plan-amount {width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px; color:var(--gold); font-size:16px; text-align:center; outline:none; height: 32px; padding: 6px 0;}
+  .day input.plan-amount {width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px; color:var(--gold); font-size:16px; text-align:center; outline:none; height: 26px; padding: 4px 0;}
 
-  .note-icon { position: absolute; top: 4px; right: 4px; font-size: 10px; cursor: pointer; color: var(--accent); }
+  .note-icon { position: absolute; top: 2px; right: 2px; font-size: 9px; cursor: pointer; color: var(--accent); }
 
-  .bar{height:12px;background:#0b0d11;border-radius:99px;margin-top:12px;overflow:hidden}
-  .bar>div{height:100%;background:linear-gradient(90deg, #4f8cff 0%, #38bdf8 40%, #37d67a 100%);border-radius:99px;transition:width .35s; box-shadow: 0 0 10px rgba(55, 214, 122, 0.4);}
+  .bar{height:10px;background:#0b0d11;border-radius:99px;margin-top:8px;overflow:hidden}
+  .bar>div{height:100%;background:linear-gradient(90deg, #4f8cff 0%, #38bdf8 40%, #37d67a 100%);border-radius:99px;transition:width .35s;}
   
-  .progress-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
-  .progress-pct { font-size:32px; font-weight: 800; letter-spacing: -1px; line-height: 1; color: var(--text); }
-  .progress-meta { text-align: right; font-size: 12px; color: var(--muted); }
+  .progress-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px; }
+  .progress-pct { font-size:28px; font-weight: 800; line-height: 1; color: var(--text); }
+  .progress-meta { text-align: right; font-size: 11px; color: var(--muted); }
   
-  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   
-  .year-nav-tiles { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px; }
-  .year-tile { background: var(--card2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 14px; 
-    font-size: 15px; font-weight: 700; color: var(--muted); cursor: pointer; transition: 0.4s; text-align: center; min-width: 65px;}
-  .year-tile.active { border: 2px solid var(--accent); color: var(--text); box-shadow: 0 0 10px rgba(79, 140, 255, 0.4); }
+  .year-nav-tiles { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 8px; }
+  .year-tile { background: var(--card2); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; 
+    font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; text-align: center; min-width: 55px;}
+  .year-tile.active { border: 2px solid var(--accent); color: var(--text); }
 
-  .nav-btn{background:var(--card2); border:1px solid var(--line); border-radius:8px; padding:10px 14px;
-    cursor:pointer; color:var(--text); font-weight:600; transition:.15s; font-size: 14px;}
-  .nav-btn:hover{background:var(--accent); color:#fff; border-color:var(--accent);}
-  .month-title{font-size:15px; font-weight:650; text-transform:capitalize;}
+  .nav-btn{background:var(--card2); border:1px solid var(--line); border-radius:6px; padding:8px 10px;
+    cursor:pointer; color:var(--text); font-weight:600; font-size: 13px;}
+  .month-title{font-size:14px; font-weight:650; text-transform:capitalize;}
 
-  .month-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px; }
-  .tile { background: #0b0d11; border: 1px solid var(--line); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.4s; min-height: 75px; position: relative;}
-  .tile-name { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #fff; opacity: 0.7; margin-bottom: 2px; }
-  .tile-sum { font-size: 13px; font-weight: 700; color: #fff; }
-  .tile-pct { font-size: 9px; margin-top: 2px; color: #fff; opacity: 0.8; font-weight: bold;}
-  .tile.active { border: 2px solid var(--accent); box-shadow: 0 0 12px rgba(79, 140, 255, 0.5); transform: scale(1.02); }
+  .month-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }
+  .tile { background: #0b0d11; border: 1px solid var(--line); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; min-height: 60px; position: relative;}
+  .tile-name { font-size: 10px; font-weight: 600; text-transform: uppercase; color: #fff; opacity: 0.7; margin-bottom: 2px; }
+  .tile-sum { font-size: 12px; font-weight: 700; color: #fff; }
+  .tile-pct { font-size: 8px; margin-top: 2px; color: #fff; opacity: 0.8; font-weight: bold;}
+  .tile.active { border: 2px solid var(--accent); transform: scale(1.02); }
   
   /* Цветовые статусы */
-  .status-dark-red { background: linear-gradient(135deg, #7f1d1d, #991b1b, #b91c1c); border-color: #ef4444; }
-  .status-light-red { background: linear-gradient(135deg, #b91c1c, #dc2626, #ef4444); border-color: #f87171; }
-  .status-yellow { background: linear-gradient(135deg, #b45309, #d97706, #f59e0b); border-color: #fbbf24; }
-  .status-light-green { background: linear-gradient(135deg, #4d7c0f, #65a30d, #84cc16); border-color: #a3e635; }
-  .status-green { 
-    background: linear-gradient(135deg, #15803d, #16a34a, #22c55e); 
-    border: 2px solid #86efac; 
-    box-shadow: 0 0 15px rgba(134, 239, 172, 0.8), 0 0 30px rgba(34, 197, 94, 0.5), inset 0 0 10px rgba(134, 239, 172, 0.3); 
-    animation: pulseGlow 2s infinite alternate;
-  }
-  @keyframes pulseGlow { 0% { box-shadow: 0 0 15px rgba(134, 239, 172, 0.6), 0 0 30px rgba(34, 197, 94, 0.3); border-color: #4ade80; } 100% { box-shadow: 0 0 25px rgba(134, 239, 172, 1), 0 0 50px rgba(34, 197, 94, 0.8); border-color: #bbf7d0; } }
+  .status-dark-red { background: linear-gradient(135deg, #7f1d1d, #991b1b); border-color: #ef4444; }
+  .status-light-red { background: linear-gradient(135deg, #b91c1c, #dc2626); border-color: #f87171; }
+  .status-yellow { background: linear-gradient(135deg, #b45309, #d97706); border-color: #fbbf24; }
+  .status-light-green { background: linear-gradient(135deg, #4d7c0f, #65a30d); border-color: #a3e635; }
+  .status-green { background: linear-gradient(135deg, #15803d, #16a34a); border: 2px solid #86efac; box-shadow: 0 0 10px rgba(134, 239, 172, 0.5); }
+  
+  .golden-match { border: 2px solid var(--gold) !important; box-shadow: 0 0 15px rgba(251, 191, 36, 0.5) !important; transform: scale(1.02); }
 
-  .golden-match { border: 2px solid var(--gold) !important; box-shadow: 0 0 20px rgba(251, 191, 36, 0.6), inset 0 0 10px rgba(251, 191, 36, 0.2) !important; animation: goldPulse 1.5s infinite alternate; transform: scale(1.02); }
-  @keyframes goldPulse { 0% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); border-color: #fcd34d; } 100% { box-shadow: 0 0 25px rgba(251, 191, 36, 0.9); border-color: #fef08a; } }
-
-  .day.day-green { background: rgba(55, 214, 122, 0.15); border-color: #22c55e; box-shadow: inset 0 0 8px rgba(55, 214, 122, 0.2); }
+  .day.day-green { background: rgba(55, 214, 122, 0.15); border-color: #22c55e; }
   .day.day-yellow { background: rgba(251, 191, 36, 0.15); border-color: #d97706; }
   .day.day-red { background: rgba(239, 68, 68, 0.15); border-color: #ef4444; }
   
@@ -156,81 +144,72 @@
   .status-light-text { color: #a3e635 !important; }
   .status-green-text { color: #37d67a !important; font-weight: bold; }
 
-  .forecast-box { margin-top: 16px; padding: 12px; background: rgba(79, 140, 255, 0.1); border: 1px solid rgba(79, 140, 255, 0.3); border-radius: 10px; font-size: 13px; line-height: 1.5; }
+  .forecast-box { margin-top: 12px; padding: 10px; background: rgba(79, 140, 255, 0.1); border: 1px solid rgba(79, 140, 255, 0.3); border-radius: 8px; font-size: 12px; line-height: 1.4; }
   .forecast-box b { color: var(--accent); }
   .forecast-box .highlight { color: #37d67a; font-weight: bold; }
 
-  .levels-table { margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; }
-  .lvl-item { background: rgba(255,255,255,0.03); border: 1px solid var(--line); padding: 8px; border-radius: 8px; text-align: center; }
+  .levels-table { margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 4px; }
+  .lvl-item { background: rgba(255,255,255,0.03); border: 1px solid var(--line); padding: 6px; border-radius: 6px; text-align: center; }
   .lvl-item.active { border-color: var(--accent); background: rgba(79, 140, 255, 0.1); }
-  .lvl-title { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
-  .lvl-val { font-size: 12px; font-weight: 700; color: var(--text); }
+  .lvl-title { font-size: 9px; color: var(--muted); margin-bottom: 2px; }
+  .lvl-val { font-size: 11px; font-weight: 700; color: var(--text); }
 
-  .quarters-block { margin-top: 20px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px dashed var(--line); border-radius: 12px; }
-  .quarters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
-  .q-tile { background: var(--card2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 4px; text-align: center; transition: 0.4s; }
-  .q-name { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
-  .q-pct { font-size: 16px; font-weight: 800; }
-  .q-info { font-size: 9px; color: var(--muted); margin-top: 4px; }
+  .quarters-block { margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px dashed var(--line); border-radius: 8px; }
+  .quarters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 8px; }
+  .q-tile { background: var(--card2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 2px; text-align: center; }
+  .q-name { font-size: 11px; font-weight: 700; margin-bottom: 2px; }
+  .q-pct { font-size: 14px; font-weight: 800; }
+  .q-info { font-size: 8px; color: var(--muted); margin-top: 2px; }
   
-  .hint-box { margin-top: 12px; padding: 10px; border-radius: 8px; text-align: center; font-weight: 600; font-size: 13px; }
+  .hint-box { margin-top: 8px; padding: 8px; border-radius: 6px; text-align: center; font-weight: 600; font-size: 12px; }
 
-  /* Модальное окно оптимизировано под мобильные */
+  /* Модальное окно */
   .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: flex-end; }
   .modal.active { display: flex; }
-  .modal-content { background: var(--card); border: 1px solid var(--line); border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; -webkit-overflow-scrolling: touch;}
-  .modal-content h3 { margin-top: 0; font-size: 18px;}
-  .modal-content select, .modal-content input, .modal-content textarea { margin-bottom: 12px; width: 100%; background: #0b0d11; border: 1px solid var(--line); border-radius: 8px; padding: 12px; color: var(--text); font-family: inherit; font-size: 16px;}
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; padding-bottom: env(safe-area-inset-bottom);}
-  .btn-cancel { background: transparent; border: 1px solid var(--line); color: var(--text); padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;}
-  .btn-save { background: var(--accent); border: none; color: #fff; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;}
+  .modal-content { background: var(--card); border: 1px solid var(--line); border-radius: 16px 16px 0 0; padding: 16px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
+  .modal-content h3 { margin-top: 0; font-size: 16px;}
+  .modal-content select, .modal-content input, .modal-content textarea { margin-bottom: 10px; padding: 10px; font-size: 16px;}
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; padding-bottom: env(safe-area-inset-bottom);}
+  .btn-cancel { background: transparent; border: 1px solid var(--line); color: var(--text); padding: 10px 16px; border-radius: 6px; font-size: 14px;}
+  .btn-save { background: var(--accent); border: none; color: #fff; padding: 10px 16px; border-radius: 6px; font-weight: bold; font-size: 14px;}
 
-  .obj-list { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-  .obj-tag { background: var(--card2); border: 1px solid var(--line); padding: 8px 12px; border-radius: 20px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-  .obj-del { background: rgba(239,68,68,0.2); border: none; color: #ef4444; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;}
+  .obj-list { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .obj-tag { background: var(--card2); border: 1px solid var(--line); padding: 6px 10px; border-radius: 16px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .obj-del { background: rgba(239,68,68,0.2); border: none; color: #ef4444; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px;}
 
-  .dreams-list { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
-  .dream-card { background: var(--card2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; position: relative; overflow: hidden; transition: all 0.4s ease; }
-  .dream-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; position: relative; z-index: 2; }
-  .dream-title { font-size: 18px; font-weight: 700; text-transform: capitalize; color: #fff; display: flex; align-items: center; gap: 8px; }
-  .dream-delete { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #ef4444; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 13px; transition: 0.2s; }
-  .dream-amounts { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; position: relative; z-index: 2; }
-  .dream-pct-large { font-size: 26px; font-weight: 800; background: linear-gradient(90deg, #a78bfa, #4f8cff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
-  .dream-cost { font-size: 14px; color: var(--muted); font-weight: bold; }
-  .dream-bar-container { width: 100%; height: 24px; background: #0b0d11; border-radius: 12px; position: relative; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.6); margin-bottom: 16px; z-index: 2; }
-  .dream-bar-fill { height: 100%; background: linear-gradient(90deg, #a78bfa 0%, #818cf8 50%, #4f8cff 100%); border-radius: 12px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); position: relative; box-shadow: 0 0 10px rgba(79, 140, 255, 0.4); }
+  .dreams-list { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+  .dream-card { background: var(--card2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; position: relative; }
+  .dream-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .dream-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .dream-delete { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #ef4444; border-radius: 4px; padding: 4px 8px; font-size: 12px; }
+  .dream-amounts { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 8px; }
+  .dream-pct-large { font-size: 22px; font-weight: 800; background: linear-gradient(90deg, #a78bfa, #4f8cff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .dream-cost { font-size: 12px; color: var(--muted); font-weight: bold; }
+  .dream-bar-container { width: 100%; height: 20px; background: #0b0d11; border-radius: 10px; position: relative; overflow: hidden; margin-bottom: 12px; }
+  .dream-bar-fill { height: 100%; background: linear-gradient(90deg, #a78bfa 0%, #818cf8 50%, #4f8cff 100%); border-radius: 10px; transition: width 0.6s; position: relative; }
   .dream-bar-fill::after { content: ''; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: shine 2.5s infinite; }
   @keyframes shine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-  .dream-input-wrap { display: flex; align-items: center; background: #0b0d11; border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; position: relative; z-index: 2; }
-  .dream-input-wrap:focus-within { border-color: var(--accent); }
-  .dream-input-wrap span { color: var(--muted); font-size: 14px; font-weight: 600; margin-right: 8px; }
-  .dream-input { border: none !important; background: transparent !important; color: var(--accent) !important; font-weight: 800 !important; font-size: 18px !important; padding: 6px 0 !important; margin: 0 !important; text-align: right; width: 100%; }
-  .dream-input:focus { outline: none; }
-  .dream-input:disabled { color: var(--gold) !important; cursor: not-allowed; opacity: 0.8; }
-  .goal-complete { border-color: var(--gold) !important; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3), inset 0 0 15px rgba(251, 191, 36, 0.1) !important; }
-  .goal-complete .dream-bar-fill { background: linear-gradient(90deg, #fbbf24, #f59e0b, #fcd34d) !important; box-shadow: 0 0 15px rgba(251, 191, 36, 0.7) !important; }
+  .dream-input-wrap { display: flex; align-items: center; background: #0b0d11; border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; }
+  .dream-input-wrap span { color: var(--muted); font-size: 13px; font-weight: 600; margin-right: 6px; }
+  .dream-input { border: none !important; background: transparent !important; color: var(--accent) !important; font-weight: 800 !important; font-size: 16px !important; padding: 6px 0 !important; margin: 0 !important; text-align: right; width: 100%; }
+  .dream-input:disabled { color: var(--gold) !important; opacity: 0.8; }
+  .goal-complete { border-color: var(--gold) !important; box-shadow: 0 0 15px rgba(251, 191, 36, 0.3) !important; }
+  .goal-complete .dream-bar-fill { background: linear-gradient(90deg, #fbbf24, #f59e0b, #fcd34d) !important; }
   .goal-complete .dream-pct-large { background: linear-gradient(90deg, #fbbf24, #fcd34d) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; }
   
-  .switch { position: relative; display: inline-block; width: 50px; height: 28px; flex-shrink: 0;}
+  .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0;}
   .switch input { opacity: 0; width: 0; height: 0; }
-  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #0b0d11; transition: .4s; border-radius: 28px; border: 1px solid var(--line); }
-  .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: var(--muted); transition: .4s; border-radius: 50%; }
+  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #0b0d11; transition: .4s; border-radius: 24px; border: 1px solid var(--line); }
+  .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: var(--muted); transition: .4s; border-radius: 50%; }
   input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
-  input:checked + .slider:before { transform: translateX(22px); background-color: #fff; }
+  input:checked + .slider:before { transform: translateX(20px); background-color: #fff; }
 
-  /* МОБИЛЬНАЯ АДАПТАЦИЯ (Экраны до 850px) */
+  /* Мобильная адаптация */
   @media(max-width:850px){
     .calendar-layout { grid-template-columns: 1fr; }
-    .top-stats { grid-template-columns: 1fr; }
+    /* Оставляем статистику в 2 колонки для экономии места */
+    .top-stats { grid-template-columns: 1fr 1fr; gap: 6px; } 
     .quarters-grid { grid-template-columns: repeat(2, 1fr); }
-    
-    /* Делаем календарь чуть компактнее по горизонтали, но крупнее по вертикали */
-    .cal { gap: 2px; }
-    .day { min-height: 65px; padding: 3px; }
-    .day input.amount, .day select.plan-select, .day input.plan-amount { font-size: 16px; height: 28px; padding: 2px;}
-    
-    .card { padding: 12px; }
-    .dream-header { flex-wrap: wrap; gap: 8px; }
   }
 </style>
 </head>
@@ -249,15 +228,15 @@
       <div class="label" style="color: var(--gold);">Управление объектами</div>
       <div style="display: flex; gap: 8px; margin-top: 8px;">
         <input type="text" id="newObjName" placeholder="Название объекта" style="flex: 1;">
-        <button class="btn-save" id="addObjBtn" style="flex: 0 0 auto; background: var(--gold); color: #000;">+</button>
+        <button class="btn-save" id="addObjBtn" style="flex: 0 0 auto; background: var(--gold); color: #000; padding: 10px 16px;">+</button>
       </div>
       <div class="obj-list" id="objList"></div>
     </div>
 
     <div class="card" id="incFactCard">
       <div class="label" id="incFactLabel">Мой фактический доход в этом месяце</div>
-      <div class="stat-val" id="incFactSum" style="font-size: 26px;">0 ₽</div>
-      <div class="sub" id="incFactPct">0% от текущей цели</div>
+      <div class="stat-val" id="incFactSum" style="font-size: 22px;">0 ₽</div>
+      <div class="sub" id="incFactPct" style="font-size: 11px;">0% от текущей цели</div>
     </div>
 
     <div class="tabs" id="incTabs"></div>
@@ -269,7 +248,7 @@
       </div>
       <div class="stat-card">
         <div class="label">Статус месяца</div>
-        <div class="stat-val" id="incStatus" style="font-size: 15px;">—</div>
+        <div class="stat-val" id="incStatus" style="font-size: 14px;">—</div>
       </div>
     </div>
 
@@ -277,19 +256,19 @@
       <div class="card">
         <div class="year-nav-tiles" id="yearTilesInc"></div>
         <div class="nav-row">
-          <button class="nav-btn" id="prevMonthInc">‹ Месяц</button>
+          <button class="nav-btn" id="prevMonthInc">‹</button>
           <div class="month-title" id="monthTitleInc">Октябрь 2026</div>
-          <button class="nav-btn" id="nextMonthInc">Месяц ›</button>
+          <button class="nav-btn" id="nextMonthInc">›</button>
         </div>
         <div class="cal" id="calInc"></div>
         
         <div class="forecast-box" id="incForecast"></div>
         
-        <div class="label" style="margin-top:20px; margin-bottom:8px;" id="levelsLabel">Шпаргалка: план на день</div>
+        <div class="label" style="margin-top:16px; margin-bottom:8px;" id="levelsLabel">Шпаргалка</div>
         <div class="levels-table" id="incLevelsList"></div>
 
         <div class="quarters-block" id="incQuartersBlock">
-          <div class="label">Анализ кварталов</div>
+          <div class="label">Кварталы</div>
           <div class="quarters-grid" id="incQuartersGrid"></div>
           <div class="hint-box" id="incQuarterHint"></div>
         </div>
@@ -306,7 +285,7 @@
   <div class="page" id="page-capital">
     <div class="top-stats">
       <div class="stat-card">
-        <div class="label">Мой накопленный капитал</div>
+        <div class="label">Накопленный капитал</div>
         <div class="stat-val" id="capGlobal">0 ₽</div>
       </div>
       <div class="stat-card">
@@ -322,21 +301,21 @@
         <div class="progress-pct" id="capPctBig">0,00%</div>
         <div class="progress-meta">Собрано: <b id="capPctDetails">0 ₽ из 60 млн</b></div>
       </div>
-      <div class="bar" style="height:16px; margin-top:8px;"><div id="capBarfill" style="width:0%;"></div></div>
+      <div class="bar" style="height:12px; margin-top:6px;"><div id="capBarfill" style="width:0%;"></div></div>
     </div>
 
     <div class="calendar-layout">
       <div class="card">
         <div class="year-nav-tiles" id="yearTilesCap"></div>
         <div class="nav-row">
-          <button class="nav-btn" id="prevMonthCap">‹ Месяц</button>
+          <button class="nav-btn" id="prevMonthCap">‹</button>
           <div class="month-title" id="monthTitleCap">Октябрь 2026</div>
-          <button class="nav-btn" id="nextMonthCap">Месяц ›</button>
+          <button class="nav-btn" id="nextMonthCap">›</button>
         </div>
         <div class="cal" id="calCap"></div>
         
         <div class="forecast-box" id="capForecast"></div>
-        <div class="label" style="margin-top:20px; margin-bottom:8px;">Шпаргалка: план на день</div>
+        <div class="label" style="margin-top:16px; margin-bottom:8px;">Шпаргалка</div>
         <div class="levels-table" id="capLevelsList"></div>
       </div>
 
@@ -349,10 +328,10 @@
 
   <!-- ВКЛАДКА 3: ЦЕЛИ -->
   <div class="page" id="page-dreams">
-    <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 16px;">
+    <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 12px;">
       <div>
-        <div class="label" style="margin-bottom: 4px;">Автораспределение</div>
-        <div style="font-size: 11px; color: var(--muted);">Делить доход пропорционально</div>
+        <div class="label" style="margin-bottom: 2px;">Автораспределение</div>
+        <div style="font-size: 10px; color: var(--muted);">Делить доход пропорционально</div>
       </div>
       <label class="switch">
         <input type="checkbox" id="autoDistributeToggle">
@@ -361,11 +340,11 @@
     </div>
 
     <div class="card">
-      <div class="label">Создать новую цель</div>
-      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+      <div class="label">Новая цель</div>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
         <input type="text" id="dreamName" placeholder="Название" style="flex: 1 1 100%;">
         <input type="number" id="dreamCost" placeholder="Стоимость, ₽" style="flex: 1;">
-        <button class="btn-save" id="addDreamBtn" style="flex: 0 0 auto; padding: 10px 20px;">Добавить</button>
+        <button class="btn-save" id="addDreamBtn" style="flex: 0 0 auto; padding: 10px 16px;">Добавить</button>
       </div>
     </div>
 
@@ -383,16 +362,16 @@
     <h3>Заметка к дню <span id="modalDate"></span></h3>
     <label class="label">Источник дохода</label>
     <select id="noteSource">
-      <option value="Работа по объекту">Работа по объекту (сделка)</option>
+      <option value="Работа по объекту">Работа по объекту</option>
       <option value="Прибыль на материалах">Прибыль на материалах</option>
       <option value="Дизайн-проект">Оплата за дизайн-проект</option>
-      <option value="Мебель и комплектация">Мебель и комплектация</option>
+      <option value="Мебель и комплектация">Мебель</option>
       <option value="Другое">Другое (своё)</option>
     </select>
-    <input type="text" id="noteCustomSource" placeholder="Своё название источника" style="display:none; margin-top: 8px;">
+    <input type="text" id="noteCustomSource" placeholder="Своё название" style="display:none; margin-top: 6px;">
     
-    <label class="label" style="margin-top: 12px;">Комментарий</label>
-    <textarea id="noteText" placeholder="Например: сдали объект..."></textarea>
+    <label class="label" style="margin-top: 10px;">Комментарий</label>
+    <textarea id="noteText" placeholder="Заметка..."></textarea>
     
     <div class="modal-actions">
       <button class="btn-cancel" id="noteCancel">Отмена</button>
@@ -618,7 +597,7 @@ function refreshIncStats() {
   const statusEl = $('incStatus'); if (pct >= 98) { statusEl.textContent = '🏆 MISSION COMPLETE'; statusEl.className = 'stat-val status-green-text'; } else if (pct >= 75) { statusEl.textContent = 'Почти у цели'; statusEl.className = 'stat-val status-light-text'; } else if (pct >= 50) { statusEl.textContent = 'Неплохо'; statusEl.className = 'stat-val status-yellow-text'; } else { statusEl.textContent = 'Нужно поднажать'; statusEl.className = 'stat-val status-red-text'; }
 
   const leftToClose = incActiveLevel - monthSum;
-  if (leftToClose > 0) { const perDay = daysLeft > 0 ? (leftToClose / daysLeft) : leftToClose; $('incForecast').innerHTML = `Внесено <b>${money(monthSum)}</b> за <b>${filledDays} дн.</b> · Осталось: <b>${money(leftToClose)}</b><br><span class="highlight">По ${money(perDay)} / день</span> на оставшиеся ${daysLeft} дн.`; } else { $('incForecast').innerHTML = `План месяца закрыт! (${money(monthSum)} из ${money(incActiveLevel)}) 🎉`; }
+  if (leftToClose > 0) { const perDay = daysLeft > 0 ? (leftToClose / daysLeft) : leftToClose; $('incForecast').innerHTML = `Внесено <b>${money(monthSum)}</b> за <b>${filledDays} дн.</b> · Осталось: <b>${money(leftToClose)}</b><br><span class="highlight">По ${money(perDay)} / день</span> на ${daysLeft} дн.`; } else { $('incForecast').innerHTML = `План месяца закрыт! (${money(monthSum)} из ${money(incActiveLevel)}) 🎉`; }
 
   let lvlHtml = ''; INCOME_LEVELS.forEach(lvl => { if (lvl === 0) return; const isActive = lvl === incActiveLevel ? 'active' : ''; const text = lvl === 1000000 ? '1 млн' : shortMoney(lvl); const left = lvl - monthSum; let perDay = 0; if (left > 0) perDay = daysLeft > 0 ? (left / daysLeft) : left; lvlHtml += `<div class="lvl-item ${isActive}"><div class="lvl-title">Цель ${text}</div><div class="lvl-val">${left > 0 ? money(perDay)+'/день' : 'Закрыто'}</div></div>`; });
   $('incLevelsList').innerHTML = lvlHtml;
@@ -637,7 +616,7 @@ function renderQuarters() {
   }
   let streak = 0; for (let q = 0; q < 4; q++) { let qSum = 0; for (let i = 0; i < 3; i++) { const m = q * 3 + i; const key = getMonthKey(new Date(y, m, 1)); const monthArr = globalData[key] || []; qSum += monthArr.reduce((a,b)=>a + (b||0), 0); } const pct = planQ > 0 ? (qSum / planQ) * 100 : 0; if (pct >= 98) streak++; else streak = 0; }
   hint.style.display = 'block';
-  if (streak >= 3) { hint.style.background = 'rgba(55, 214, 122, 0.2)'; hint.style.color = '#37d67a'; hint.textContent = `🚀 Стабильный темп ${streak} квартала подряд! Пора переходить на новый уровень.`; } else if (streak === 2) { hint.style.background = 'rgba(251, 191, 36, 0.2)'; hint.style.color = '#fbbf24'; hint.textContent = `🔥 Уже 2 квартала подряд! Ещё один — и можно брать новый уровень.`; } else if (streak === 1) { hint.style.background = 'rgba(79, 140, 255, 0.2)'; hint.style.color = 'var(--accent)'; hint.textContent = `✅ Один квартал закрыт. Держи темп ещё 2 квартала.`; } else { hint.style.background = 'rgba(255,255,255,0.05)'; hint.style.color = 'var(--muted)'; hint.textContent = `Закрой квартал (98%+), чтобы начать серию.`; }
+  if (streak >= 3) { hint.style.background = 'rgba(55, 214, 122, 0.2)'; hint.style.color = '#37d67a'; hint.textContent = `🚀 Темп ${streak} кв. подряд! Пора на новый уровень.`; } else if (streak === 2) { hint.style.background = 'rgba(251, 191, 36, 0.2)'; hint.style.color = '#fbbf24'; hint.textContent = `🔥 2 квартала подряд! Ещё один — и новый уровень.`; } else if (streak === 1) { hint.style.background = 'rgba(79, 140, 255, 0.2)'; hint.style.color = 'var(--accent)'; hint.textContent = `✅ Один квартал закрыт. Держи темп ещё 2 квартала.`; } else { hint.style.background = 'rgba(255,255,255,0.05)'; hint.style.color = 'var(--muted)'; hint.textContent = `Закрой квартал (98%+), чтобы начать серию.`; }
 }
 
 function renderIncTiles() {
