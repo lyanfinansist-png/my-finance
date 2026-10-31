@@ -15,7 +15,7 @@
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
   
-  /* ИСПРАВЛЕНИЕ СКРОЛЛА И УДАЛЕНИЕ ПОЛОСЫ ПРОКРУТКИ */
+  /* УБИРАЕМ ПОЛОСУ ПРОКРУТКИ, НО ОСТАВЛЯЕМ СКРОЛЛ */
   html, body {
     margin: 0; padding: 0;
     width: 100%; height: 100%;
@@ -25,12 +25,11 @@
     -webkit-text-size-adjust: 100%; 
     overflow-y: auto; 
     overflow-x: hidden;
-    -ms-overflow-style: none; /* IE и Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
   }
   
-  /* Скрываем полосу прокрутки в Chrome/Safari */
-  html::-webkit-scrollbar, body::-webkit-scrollbar, .tabs::-webkit-scrollbar { 
+  html::-webkit-scrollbar, body::-webkit-scrollbar, .tabs::-webkit-scrollbar, .year-nav-tiles::-webkit-scrollbar { 
     display: none; 
   }
 
@@ -38,7 +37,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding-top: calc(8px + env(safe-area-inset-top));
-    padding-bottom: calc(30px + env(safe-area-inset-bottom)); /* Больше места снизу, чтобы было куда скроллить */
+    padding-bottom: calc(30px + env(safe-area-inset-bottom));
     padding-left: 8px;
     padding-right: 8px;
   }
@@ -50,7 +49,7 @@
   .page { display: none; }
   .page.active { display: block; }
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px; overflow: hidden;}
   .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   
   input[type=number], input[type=text], select {
@@ -60,10 +59,11 @@
     border-radius:8px;
     padding:10px;
     color:var(--text);
-    font-size:16px; /* 16px предотвращает зум iOS */
+    font-size:16px; 
     outline: none;
     margin-top: 4px;
     -webkit-appearance: none;
+    min-width: 0; /* Важно для сеток */
   }
   input:focus, select:focus {border-color:var(--accent);}
 
@@ -71,34 +71,43 @@
   input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   input[type=number] { -moz-appearance: textfield; }
   
-  .tabs{display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; margin-bottom:12px; padding-bottom: 4px; -webkit-overflow-scrolling: touch;}
+  .tabs{display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; margin-bottom:12px; padding-bottom: 4px;}
   .tab{background:var(--card2); border:1px solid var(--line); border-radius:6px; padding:8px 12px; 
     font-size:12px; font-weight:600; cursor:pointer; color:var(--muted); transition:.15s;
     display:flex; flex-direction:column; gap:2px; align-items:center; white-space: nowrap; -webkit-user-select: none; user-select: none;}
   .tab.active{background:var(--accent); color:#fff; border-color:var(--accent);}
   .tab .tab-main{font-size:13px;}
 
-  /* ВЕРХНИЕ КАРТОЧКИ (Ровно 2 колонки) */
+  /* ВЕРХНИЕ КАРТОЧКИ */
   .top-stats{display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:12px;}
-  .stat-card{background:var(--card2); border:1px solid var(--line); border-radius:10px; padding:10px; overflow: hidden;}
-  .stat-val{font-size:16px; font-weight:700; margin-top:2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+  .stat-card{background:var(--card2); border:1px solid var(--line); border-radius:10px; padding:8px 10px; min-width: 0;}
+  .stat-val{font-size:15px; font-weight:700; margin-top:2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
   
   .calendar-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; }
 
-  /* КАЛЕНДАРЬ */
-  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px}
+  /* КАЛЕНДАРЬ - ЖЕСТКАЯ ФИКСАЦИЯ ШИРИНЫ */
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px; width: 100%;}
   .day{background:var(--card2);border:1px solid var(--line);border-radius:6px;padding:2px;
-    display:flex;flex-direction:column;justify-content:space-between;gap:2px; transition: 0.3s; position: relative; min-height: 60px;}
+    display:flex;flex-direction:column;justify-content:space-between;gap:2px; min-height: 56px; min-width: 0; overflow: hidden;}
   .day .dnum{font-size:9px;color:var(--muted);display:flex;justify-content:space-between; padding: 0 2px;}
   
+  /* Инпуты в календаре: убираем всё лишнее, чтобы влезло */
   .day input.amount {
     width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px;
-    color:var(--text); font-size:16px; text-align:center; padding: 4px 0; height: 26px;
+    color:var(--text); font-size:16px; text-align:center; padding: 2px 0; height: 24px; min-width: 0;
   }
   
-  .day select.plan-select {width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px; color:var(--gold); font-size:14px; outline:none; height: 26px; padding: 0 2px; text-overflow: ellipsis;}
-  .day select.plan-select option {background: var(--card2); color: var(--text);}
-  .day input.plan-amount {width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px; color:var(--gold); font-size:16px; text-align:center; outline:none; height: 26px; padding: 4px 0;}
+  .day select.plan-select {
+    width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px; 
+    color:var(--gold); font-size:12px; outline:none; height: 24px; padding: 0; 
+    text-overflow: ellipsis; text-align: center; text-align-last: center;
+    -webkit-appearance: none; appearance: none; /* Убираем стрелку */
+  }
+  .day select.plan-select option {background: var(--card2); color: var(--text); font-size: 14px; text-align: left;}
+  .day input.plan-amount {
+    width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px; 
+    color:var(--gold); font-size:16px; text-align:center; outline:none; height: 24px; padding: 2px 0; min-width: 0;
+  }
 
   .note-icon { position: absolute; top: 2px; right: 2px; font-size: 9px; cursor: pointer; color: var(--accent); }
 
@@ -205,13 +214,10 @@
   input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
   input:checked + .slider:before { transform: translateX(20px); background-color: #fff; }
 
-  /* ЖЕСТКАЯ МОБИЛЬНАЯ АДАПТАЦИЯ (всегда 2 колонки в топе) */
+  /* МОБИЛЬНАЯ АДАПТАЦИЯ */
   @media(max-width:850px){
     .calendar-layout { grid-template-columns: 1fr; }
     .quarters-grid { grid-template-columns: repeat(2, 1fr); }
-    .stat-card { padding: 8px 6px; }
-    .stat-card .label { font-size: 9px; }
-    .stat-val { font-size: 14px; }
   }
 </style>
 </head>
@@ -245,11 +251,11 @@
 
     <div class="top-stats">
       <div class="stat-card">
-        <div class="label" id="incTargetLabel">Текущая цель дохода</div>
+        <div class="label" id="incTargetLabel">Цель дохода</div>
         <div class="stat-val" id="incTarget">—</div>
       </div>
       <div class="stat-card">
-        <div class="label">Статус месяца</div>
+        <div class="label">Статус</div>
         <div class="stat-val" id="incStatus" style="font-size: 14px;">—</div>
       </div>
     </div>
@@ -287,7 +293,7 @@
   <div class="page" id="page-capital">
     <div class="top-stats">
       <div class="stat-card">
-        <div class="label">Накопленный капитал</div>
+        <div class="label">Капитал</div>
         <div class="stat-val" id="capGlobal">0 ₽</div>
       </div>
       <div class="stat-card">
