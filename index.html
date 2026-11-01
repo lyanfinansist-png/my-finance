@@ -77,6 +77,7 @@
   input:focus, select:focus {border-color:var(--accent);}
   input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   
+  /* ВКЛАДКИ (План, Факт, 150к и т.д.) */
   .tabs{display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; margin-bottom:10px; padding-bottom: 4px;}
   .tab{background:var(--card2); border:1px solid var(--line); border-radius:6px; padding:8px 12px; 
     font-size:12px; font-weight:600; cursor:pointer; color:var(--muted); transition:.15s;
@@ -267,6 +268,7 @@
         <div class="sub" id="incFactPct" style="font-size: 11px;">0% от текущей цели</div>
       </div>
 
+      <!-- ВОТ ЗДЕСЬ ДОЛЖНЫ БЫТЬ ВКЛАДКИ ПЛАН/ФАКТ -->
       <div class="tabs" id="incTabs"></div>
 
       <div class="top-stats">
@@ -321,6 +323,7 @@
         </div>
       </div>
 
+      <!-- ВОТ ЗДЕСЬ ДОЛЖНЫ БЫТЬ ВКЛАДКИ (1 ГОД, 2 ГОДА И Т.Д.) -->
       <div class="tabs" id="capTabs"></div>
 
       <div class="card" style="border-color: var(--accent);">
@@ -438,6 +441,12 @@ let globalData = {}, notesData = {}, dreamsData = [], objectsData = [], planData
 let isWritingLocal = false, saveTimeout;
 let isRegisterMode = false;
 
+// Инициализация констант
+const GOAL_CAPITAL = 60000000;
+const TERMS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; 
+const INCOME_LEVELS = [0, 150000, 250000, 300000, 350000, 400000, 450000, 500000, 600000, 650000, 1000000];
+
+// --- АВТОРИЗАЦИЯ ---
 $('authBtn').addEventListener('click', () => {
   const email = $('authEmail').value.trim();
   const password = $('authPassword').value;
@@ -545,6 +554,7 @@ function saveAll() {
   }, 500); 
 }
 
+// --- ЛОГИКА РАБОТЫ ---
 function getMonthKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
 function getNoteKey(y, m, d) { return y + '-' + (m+1) + '-' + d; }
 
@@ -561,6 +571,7 @@ $('nav-income').addEventListener('click', () => { document.querySelectorAll('.ma
 $('nav-capital').addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); $('nav-capital').classList.add('active'); $('page-capital').classList.add('active'); updateCap(); });
 $('nav-dreams').addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); $('nav-dreams').classList.add('active'); $('page-dreams').classList.add('active'); renderDreams(); });
 
+// ДОХОД
 let incActiveLevel = 'plan'; 
 let incViewDate = new Date(2026, 9, 1);
 
@@ -741,6 +752,7 @@ function updateInc() { initIncCalendar(); refreshIncStats(); }
 $('prevMonthInc').addEventListener('click', () => { incViewDate.setMonth(incViewDate.getMonth() - 1); updateInc(); });
 $('nextMonthInc').addEventListener('click', () => { incViewDate.setMonth(incViewDate.getMonth() + 1); updateInc(); });
 
+// КАПИТАЛ
 let capActiveTerm = 10, capViewDate = new Date(2026, 9, 1);
 function renderCapTabs() {
   const tabs = $('capTabs'); tabs.innerHTML = '';
@@ -814,6 +826,7 @@ function updateCap() { initCapCalendar(); refreshCapStats(); }
 $('prevMonthCap').addEventListener('click', () => { capViewDate.setMonth(capViewDate.getMonth() - 1); updateCap(); });
 $('nextMonthCap').addEventListener('click', () => { capViewDate.setMonth(capViewDate.getMonth() + 1); updateCap(); });
 
+// ЦЕЛИ
 function renderDreams() {
   const list = $('dreamsList'); list.innerHTML = '';
   const autoDist = localStorage.getItem('autoDistribute') === 'true'; $('autoDistributeToggle').checked = autoDist;
@@ -846,6 +859,9 @@ function renderDreams() {
 
 $('autoDistributeToggle').addEventListener('change', (e) => { localStorage.setItem('autoDistribute', e.target.checked); renderDreams(); });
 $('addDreamBtn').addEventListener('click', () => { const name = $('dreamName').value.trim(), cost = +$('dreamCost').value; if (!name || !cost) { alert('Заполни название и стоимость!'); return; } dreamsData.push({ name, cost, saved: 0 }); saveAll(); $('dreamName').value = ''; $('dreamCost').value = ''; renderDreams(); });
+
+// --- ЗАПУСК ---
+renderIncTabs(); initIncCalendar(); renderCapTabs(); initCapCalendar();
 
 </script>
 </body>
