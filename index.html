@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f1115">
-<title>Моя система — Доход, Капитал, Цели</title>
+<title>Финанс Планер Роста</title>
 <style>
   :root{
     --bg:#0f1115; --card:#171a21; --card2:#1e222b; --text:#e8eaed;
@@ -428,7 +428,6 @@ const shortMoney = n => {
   return fmt(n);
 };
 
-// --- НАСТРОЙКА FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyBn0fm1rqAH2XmxFw42SSAmE9Yx8w5WHEc",
   authDomain: "my-finance-app-7bbbc.firebaseapp.com",
@@ -447,9 +446,7 @@ let globalData = {}, notesData = {}, dreamsData = [], objectsData = [], planData
 let isWritingLocal = false, saveTimeout;
 let isRegisterMode = false;
 
-// --- ЛОГИКА АВТОРИЗАЦИИ ---
-
-// Обработка кнопки "Войти" / "Создать аккаунт"
+// ЛОГИКА АВТОРИЗАЦИИ
 $('authBtn').addEventListener('click', () => {
   const email = $('authEmail').value.trim();
   const password = $('authPassword').value;
@@ -464,16 +461,13 @@ $('authBtn').addEventListener('click', () => {
 
   if (isRegisterMode) {
     auth.createUserWithEmailAndPassword(email, password)
-      .then(() => { /* Успешная регистрация, сработает onAuthStateChanged */ })
       .catch(err => { errorEl.textContent = "Ошибка: " + err.message; errorEl.style.display = 'block'; });
   } else {
     auth.signInWithEmailAndPassword(email, password)
-      .then(() => { /* Успешный вход */ })
       .catch(err => { errorEl.textContent = "Неверная почта или пароль."; errorEl.style.display = 'block'; });
   }
 });
 
-// Переключение между Входом и Регистрацией
 $('authSwitchBtn').addEventListener('click', () => {
   isRegisterMode = !isRegisterMode;
   $('authError').style.display = 'none';
@@ -492,18 +486,15 @@ $('authSwitchBtn').addEventListener('click', () => {
   }
 });
 
-// Сброс пароля
 $('resetPassBtn').addEventListener('click', () => {
   const email = $('authEmail').value.trim();
   const errorEl = $('authError');
   errorEl.style.display = 'none';
-
   if (!email) {
-    errorEl.textContent = 'Введите вашу почту, чтобы сбросить пароль.';
+    errorEl.textContent = 'Введите вашу почту.';
     errorEl.style.display = 'block';
     return;
   }
-
   auth.sendPasswordResetEmail(email)
     .then(() => {
       errorEl.style.color = '#37d67a';
@@ -517,25 +508,18 @@ $('resetPassBtn').addEventListener('click', () => {
     });
 });
 
-// Выход
-$('logoutBtn').addEventListener('click', () => {
-  auth.signOut();
-});
+$('logoutBtn').addEventListener('click', () => { auth.signOut(); });
 
-// Следим за состоянием входа
 auth.onAuthStateChanged(user => {
   if (user) {
-    // Пользователь вошел
     $('authContainer').style.display = 'none';
     $('appContainer').style.display = 'block';
     $('userEmailDisplay').textContent = user.email;
     $('authEmail').value = '';
     $('authPassword').value = '';
 
-    // Инициализируем ссылку на ЛИЧНУЮ папку пользователя
     syncRef = db.ref('users/' + user.uid + '/finance_data');
 
-    // Скачиваем данные
     syncRef.on('value', (snapshot) => {
       if (isWritingLocal) return;
       const cloudData = snapshot.val();
@@ -546,26 +530,21 @@ auth.onAuthStateChanged(user => {
         objectsData = cloudData.objectsData || [];
         planData = cloudData.planData || {};
       } else {
-        // Если это новый пользователь, данные пустые
         globalData = {}; notesData = {}; dreamsData = []; objectsData = []; planData = {};
       }
       updateInc(); updateCap(); renderDreams();
     });
 
   } else {
-    // Пользователь вышел
     $('authContainer').style.display = 'flex';
     $('appContainer').style.display = 'none';
-    if (syncRef) syncRef.off(); // Отключаем слушатель БД
-    
-    // Очищаем данные из памяти, чтобы не показывать чужие цифры
+    if (syncRef) syncRef.off(); 
     globalData = {}; notesData = {}; dreamsData = []; objectsData = []; planData = {};
   }
 });
 
-// Функция сохранения (теперь пишет в папку пользователя)
 function saveAll() {
-  if (!syncRef) return; // Если не залогинен, не сохраняем
+  if (!syncRef) return;
   isWritingLocal = true;
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(() => {
@@ -575,8 +554,7 @@ function saveAll() {
   }, 500); 
 }
 
-
-// --- ДАЛЬШЕ ИДЕТ ВАШ СТАРЫЙ КОД (БЕЗ ИЗМЕНЕНИЙ) ---
+// ДАЛЬШЕ ВАШ СТАРЫЙ КОД БЕЗ ИЗМЕНЕНИЙ
 function getMonthKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
 function getNoteKey(y, m, d) { return y + '-' + (m+1) + '-' + d; }
 
@@ -593,7 +571,6 @@ $('nav-income').addEventListener('click', () => { document.querySelectorAll('.ma
 $('nav-capital').addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); $('nav-capital').classList.add('active'); $('page-capital').classList.add('active'); updateCap(); });
 $('nav-dreams').addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); $('nav-dreams').classList.add('active'); $('page-dreams').classList.add('active'); renderDreams(); });
 
-// ДОХОД
 let incActiveLevel = 'plan'; 
 let incViewDate = new Date(2026, 9, 1);
 
@@ -774,7 +751,6 @@ function updateInc() { initIncCalendar(); refreshIncStats(); }
 $('prevMonthInc').addEventListener('click', () => { incViewDate.setMonth(incViewDate.getMonth() - 1); updateInc(); });
 $('nextMonthInc').addEventListener('click', () => { incViewDate.setMonth(incViewDate.getMonth() + 1); updateInc(); });
 
-// КАПИТАЛ
 let capActiveTerm = 10, capViewDate = new Date(2026, 9, 1);
 function renderCapTabs() {
   const tabs = $('capTabs'); tabs.innerHTML = '';
@@ -848,7 +824,6 @@ function updateCap() { initCapCalendar(); refreshCapStats(); }
 $('prevMonthCap').addEventListener('click', () => { capViewDate.setMonth(capViewDate.getMonth() - 1); updateCap(); });
 $('nextMonthCap').addEventListener('click', () => { capViewDate.setMonth(capViewDate.getMonth() + 1); updateCap(); });
 
-// ЦЕЛИ
 function renderDreams() {
   const list = $('dreamsList'); list.innerHTML = '';
   const autoDist = localStorage.getItem('autoDistribute') === 'true'; $('autoDistributeToggle').checked = autoDist;
