@@ -226,7 +226,6 @@
 </head>
 <body>
 
-<!-- ЭКРАН ВХОДА -->
 <div id="authContainer">
   <div class="auth-box">
     <h2 id="authTitle">Вход в систему</h2>
@@ -239,10 +238,8 @@
   </div>
 </div>
 
-<!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
 <div id="appContainer">
   <div class="wrap">
-    
     <div class="header-top">
       <div class="user-email" id="userEmailDisplay"></div>
       <button class="logout-btn" id="logoutBtn">Выйти</button>
@@ -254,7 +251,6 @@
       <div class="main-tab" id="nav-dreams">🎯 Цели</div>
     </div>
 
-    <!-- ВКЛАДКА 1: ДОХОД -->
     <div class="page active" id="page-income">
       <div class="card" id="objectManager" style="display:none; border-color: var(--gold);">
         <div class="label" style="color: var(--gold);">Управление объектами</div>
@@ -313,7 +309,6 @@
       </div>
     </div>
 
-    <!-- ВКЛАДКА 2: КАПИТАЛ -->
     <div class="page" id="page-capital">
       <div class="top-stats">
         <div class="stat-card">
@@ -358,7 +353,6 @@
       </div>
     </div>
 
-    <!-- ВКЛАДКА 3: ЦЕЛИ -->
     <div class="page" id="page-dreams">
       <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 12px;">
         <div>
@@ -389,7 +383,6 @@
   </div>
 </div>
 
-<!-- Модальное окно для заметок -->
 <div class="modal" id="noteModal">
   <div class="modal-content">
     <h3>Заметка к дню <span id="modalDate"></span></h3>
@@ -413,7 +406,6 @@
   </div>
 </div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -429,7 +421,7 @@ const shortMoney = n => {
 };
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBn0fm1rqAH2XmxFw42SSAmE9Yx8w5WHEc",
+  apiKey: "AIzaSyBn0fmlrqaH2Xmxfw42ZSAmE9xY8w5WHEc",
   authDomain: "my-finance-app-7bbbc.firebaseapp.com",
   databaseURL: "https://my-finance-app-7bbbc-default-rtdb.firebaseio.com/",
   projectId: "my-finance-app-7bbbc",
@@ -446,7 +438,6 @@ let globalData = {}, notesData = {}, dreamsData = [], objectsData = [], planData
 let isWritingLocal = false, saveTimeout;
 let isRegisterMode = false;
 
-// ЛОГИКА АВТОРИЗАЦИИ
 $('authBtn').addEventListener('click', () => {
   const email = $('authEmail').value.trim();
   const password = $('authPassword').value;
@@ -554,7 +545,6 @@ function saveAll() {
   }, 500); 
 }
 
-// ДАЛЬШЕ ВАШ СТАРЫЙ КОД БЕЗ ИЗМЕНЕНИЙ
 function getMonthKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
 function getNoteKey(y, m, d) { return y + '-' + (m+1) + '-' + d; }
 
