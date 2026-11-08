@@ -11,7 +11,7 @@
   :root{
     --bg:#0f1115; --card:#171a21; --card2:#1e222b; --text:#e8eaed;
     --muted:#9aa0aa; --accent:#4f8cff; --line:#2a2f3a;
-    --purple:#a78bfa; --gold:#fbbf24;
+    --purple:#a78bfa; --gold:#fbbf24; --green:#37d67a;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
   
@@ -36,7 +36,7 @@
     padding: 24px; width: 100%; max-width: 380px; text-align: center;
   }
   .auth-box h2 { margin-top: 0; font-size: 22px; color: #fff; margin-bottom: 20px; }
-  .auth-box input { margin-bottom: 12px; padding: 12px; font-size: 16px; }
+  .auth-box input[type="email"], .auth-box input[type="password"] { margin-bottom: 12px; padding: 12px; font-size: 16px; }
   .auth-btn {
     width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none;
     border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px;
@@ -44,6 +44,10 @@
   .auth-btn.secondary { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
   .auth-link { display: block; margin-top: 16px; color: var(--muted); font-size: 14px; cursor: pointer; text-decoration: underline;}
   .auth-error { color: crimson; font-size: 13px; margin-top: 10px; display: none; }
+  
+  /* ЧЕКБОКС ЗАПОМНИТЬ МЕНЯ */
+  .remember-wrap { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-bottom: 12px; font-size: 14px; color: var(--muted); }
+  .remember-wrap input { margin: 0; width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
 
   /* ОСНОВНОЕ ПРИЛОЖЕНИЕ */
   #appContainer { display: none; }
@@ -69,13 +73,16 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px; overflow: hidden;}
   .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   
-  input[type=text], input[type=email], input[type=password], select {
+  input[type=text], input[type=email], input[type=password], select, textarea {
     width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:8px;
     padding:8px; color:var(--text); font-size:16px; outline: none; margin-top: 4px;
-    -webkit-appearance: none; min-width: 0; 
+    -webkit-appearance: none; min-width: 0; transition: all 0.2s; font-family: inherit;
   }
-  input:focus, select:focus {border-color:var(--accent);}
+  input:focus, select:focus, textarea:focus {border-color:var(--accent);}
+  textarea { resize: vertical; min-height: 80px; }
   
+  .input-filled { border-color: var(--green) !important; box-shadow: 0 0 5px rgba(55, 214, 122, 0.3); color: #fff; }
+
   .tabs{display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; margin-bottom:10px; padding-bottom: 4px;}
   .tab{background:var(--card2); border:1px solid var(--line); border-radius:6px; padding:8px 12px; 
     font-size:12px; font-weight:600; cursor:pointer; color:var(--muted); transition:.15s;
@@ -90,17 +97,14 @@
   .calendar-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; }
 
   .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px; width: 100%;}
-  
-  /* Чуть увеличили высоту ячейки, чтобы влезли 2 поля ввода в режиме Факт */
   .day{background:var(--card2);border:1px solid var(--line);border-radius:4px;padding:2px;
-    display:flex;flex-direction:column;justify-content:space-between;gap:2px; min-height: 75px; min-width: 0; overflow: hidden;}
+    display:flex;flex-direction:column;justify-content:flex-start;gap:2px; min-height: 85px; min-width: 0; overflow: hidden; position: relative;}
   .day .dnum{font-size:8px;color:var(--muted);display:flex;justify-content:space-between; padding: 0 1px;}
   
-  /* Поля ввода в календаре (с шрифтом моноширинным для ровных цифр) */
   .day input.amount {
     width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px;
     color:var(--text); font-size: 11px; font-family: monospace; font-weight: bold; letter-spacing: -0.5px; 
-    text-align:center; padding: 0; height: 24px; min-width: 0;
+    text-align:center; padding: 0; height: 22px; min-width: 0; transition: all 0.2s;
   }
   
   .day select.plan-select {
@@ -113,11 +117,20 @@
   .day input.plan-amount {
     width:100%; background:#0b0d11; border:1px solid var(--line); border-radius:4px; 
     color:var(--gold); font-size: 11px; font-family: monospace; font-weight: bold; letter-spacing: -0.5px; 
-    text-align:center; outline:none; height: 24px; padding: 0; min-width: 0;
+    text-align:center; outline:none; height: 24px; padding: 0; min-width: 0; transition: all 0.2s;
   }
 
-  .day .note { font-size: 7px; color: var(--accent); text-align: center; line-height: 1; margin-top: 1px; white-space: nowrap; overflow: hidden; opacity: 0.8;}
-  .note-icon { position: absolute; top: 2px; right: 2px; font-size: 9px; cursor: pointer; color: var(--accent); }
+  .day .note { 
+      font-size: 8px; 
+      color: var(--accent); 
+      text-align: center; 
+      cursor: pointer; 
+      margin-top: auto; 
+      padding: 2px 0;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+  }
+  .note-icon { position: absolute; top: 2px; right: 2px; font-size: 9px; cursor: pointer; color: var(--gold); z-index: 10;}
 
   .bar{height:10px;background:#0b0d11;border-radius:99px;margin-top:8px;overflow:hidden}
   .bar>div{height:100%;background:linear-gradient(90deg, #4f8cff 0%, #38bdf8 40%, #37d67a 100%);border-radius:99px;transition:width .35s;}
@@ -159,11 +172,11 @@
   .status-red-text { color: #ef4444 !important; }
   .status-yellow-text { color: #fbbf24 !important; }
   .status-light-text { color: #a3e635 !important; }
-  .status-green-text { color: #37d67a !important; font-weight: bold; }
+  .status-green-text { color: var(--green) !important; font-weight: bold; }
 
   .forecast-box { margin-top: 12px; padding: 10px; background: rgba(79, 140, 255, 0.1); border: 1px solid rgba(79, 140, 255, 0.3); border-radius: 8px; font-size: 12px; line-height: 1.4; }
   .forecast-box b { color: var(--accent); }
-  .forecast-box .highlight { color: #37d67a; font-weight: bold; }
+  .forecast-box .highlight { color: var(--green); font-weight: bold; }
 
   .levels-table { margin-top: 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 4px; }
   .lvl-item { background: rgba(255,255,255,0.03); border: 1px solid var(--line); padding: 6px; border-radius: 6px; text-align: center; }
@@ -180,6 +193,7 @@
   
   .hint-box { margin-top: 8px; padding: 8px; border-radius: 6px; text-align: center; font-weight: 600; font-size: 12px; }
 
+  /* МОДАЛЬНОЕ ОКНО */
   .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: flex-end; }
   .modal.active { display: flex; }
   .modal-content { background: var(--card); border: 1px solid var(--line); border-radius: 16px 16px 0 0; padding: 16px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
@@ -205,10 +219,12 @@
   .dream-bar-fill { height: 100%; background: linear-gradient(90deg, #a78bfa 0%, #818cf8 50%, #4f8cff 100%); border-radius: 10px; transition: width 0.6s; position: relative; }
   .dream-bar-fill::after { content: ''; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: shine 2.5s infinite; }
   @keyframes shine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-  .dream-input-wrap { display: flex; align-items: center; background: #0b0d11; border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; }
+  .dream-input-wrap { display: flex; align-items: center; background: #0b0d11; border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; transition: all 0.2s;}
   .dream-input-wrap span { color: var(--muted); font-size: 13px; font-weight: 600; margin-right: 6px; }
-  .dream-input { border: none !important; background: transparent !important; color: var(--accent) !important; font-weight: 800 !important; font-size: 16px !important; padding: 6px 0 !important; margin: 0 !important; text-align: right; width: 100%; font-family: monospace;}
+  .dream-input { border: none !important; background: transparent !important; color: var(--accent) !important; font-weight: 800 !important; font-size: 16px !important; padding: 6px 0 !important; margin: 0 !important; text-align: right; width: 100%; font-family: monospace; box-shadow: none !important;}
   .dream-input:disabled { color: var(--gold) !important; opacity: 0.8; }
+  .dream-input-wrap.input-filled { border-color: var(--green); box-shadow: 0 0 5px rgba(55, 214, 122, 0.3); }
+
   .goal-complete { border-color: var(--gold) !important; box-shadow: 0 0 15px rgba(251, 191, 36, 0.3) !important; }
   .goal-complete .dream-bar-fill { background: linear-gradient(90deg, #fbbf24, #f59e0b, #fcd34d) !important; }
   .goal-complete .dream-pct-large { background: linear-gradient(90deg, #fbbf24, #fcd34d) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; }
@@ -219,6 +235,17 @@
   .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 2px; bottom: 2px; background-color: var(--muted); transition: .4s; border-radius: 50%; }
   input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
   input:checked + .slider:before { transform: translateX(20px); background-color: #fff; }
+
+  /* СТИЛИ ДЛЯ СВОДНОЙ ТАБЛИЦЫ */
+  .summary-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .summary-item { background: var(--card2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .sum-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 14px; }
+  .sum-date { color: var(--muted); font-size: 12px; }
+  .sum-amount { color: var(--green); font-size: 15px; }
+  .sum-saved { color: var(--accent); font-size: 12px; font-weight: normal;}
+  .sum-details { font-size: 12px; color: var(--text); background: rgba(255,255,255,0.03); padding: 6px; border-radius: 4px; margin-top: 4px;}
+  .sum-obj { color: var(--gold); font-weight: 600; margin-bottom: 2px;}
+  .sum-comment { font-style: italic; color: var(--muted); }
 
   @media(max-width:850px){
     .calendar-layout { grid-template-columns: 1fr; }
@@ -233,6 +260,12 @@
     <h2 id="authTitle">Вход в систему</h2>
     <input type="email" id="authEmail" placeholder="Ваша почта (Email)" autocomplete="email">
     <input type="password" id="authPassword" placeholder="Пароль" autocomplete="current-password">
+    
+    <div class="remember-wrap">
+      <input type="checkbox" id="rememberMe" checked>
+      <label for="rememberMe">Запомнить меня</label>
+    </div>
+
     <div class="auth-error" id="authError"></div>
     <button class="auth-btn" id="authBtn">Войти</button>
     <button class="auth-btn secondary" id="authSwitchBtn" style="margin-top: 8px;">Создать аккаунт</button>
@@ -251,6 +284,7 @@
       <div class="main-tab active" id="nav-income">📈 Доход</div>
       <div class="main-tab" id="nav-capital">💰 Капитал</div>
       <div class="main-tab" id="nav-dreams">🎯 Цели</div>
+      <div class="main-tab" id="nav-summary">📊 Сводная</div>
     </div>
 
     <div class="page active" id="page-income">
@@ -382,24 +416,26 @@
       </div>
     </div>
 
+    <div class="page" id="page-summary">
+      <div class="card">
+        <div class="label">История поступлений (Сводная)</div>
+        <div class="summary-list" id="summaryList"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <div class="modal" id="noteModal">
   <div class="modal-content">
-    <h3>Заметка к дню <span id="modalDate"></span></h3>
-    <label class="label">Источник дохода</label>
-    <select id="noteSource">
-      <option value="Работа по объекту">Работа по объекту</option>
-      <option value="Прибыль на материалах">Прибыль на материалах</option>
-      <option value="Дизайн-проект">Оплата за дизайн-проект</option>
-      <option value="Мебель и комплектация">Мебель</option>
-      <option value="Другое">Другое (своё)</option>
-    </select>
-    <input type="text" id="noteCustomSource" placeholder="Своё название" style="display:none; margin-top: 6px;">
+    <h3>Детали дохода за <span id="modalDate"></span></h3>
     
-    <label class="label" style="margin-top: 10px;">Комментарий</label>
-    <textarea id="noteText" placeholder="Заметка..."></textarea>
+    <label class="label">Объект / Источник (за что пришли)</label>
+    <select id="noteSource"></select>
+    <input type="text" id="noteCustomSource" placeholder="Свой источник" style="display:none; margin-top: 6px;">
+    
+    <label class="label" style="margin-top: 10px;">Комментарий (что именно сделано / продано)</label>
+    <textarea id="noteText" placeholder="Например: Продал тумбу с объекта..."></textarea>
     
     <div class="modal-actions">
       <button class="btn-cancel" id="noteCancel">Отмена</button>
@@ -422,14 +458,28 @@ const shortMoney = n => {
   return fmt(n);
 };
 
-// ФОРМАТИРОВАНИЕ ЧИСЕЛ С ТОЧКАМИ
 const formatNumber = (num) => {
   if (!num || isNaN(num) || Number(num) === 0) return '';
-  return Number(num).toLocaleString('de-DE'); // Будет 100.000
+  return Number(num).toLocaleString('de-DE');
 };
 const parseNumber = (str) => {
   if (!str) return 0;
   return Number(str.toString().replace(/\./g, '').replace(/[^0-9]/g, '')) || 0;
+};
+
+const getMonthSavedTotal = (monthData) => {
+    if (!monthData) return 0;
+    let sum = 0;
+    if (Array.isArray(monthData)) {
+        monthData.forEach(d => {
+            if (d) sum += (d.saved || (typeof d === 'number' ? d : 0));
+        });
+    } else if (typeof monthData === 'object') {
+        Object.values(monthData).forEach(d => {
+            if (d) sum += (d.saved || (typeof d === 'number' ? d : 0));
+        });
+    }
+    return sum;
 };
 
 const firebaseConfig = {
@@ -451,14 +501,14 @@ let isWritingLocal = false, saveTimeout;
 let isRegisterMode = false;
 
 const GOAL_CAPITAL = 60000000;
-// Добавили 50 000 и 100 000
 const TERMS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; 
 const INCOME_LEVELS = [0, 50000, 100000, 150000, 250000, 300000, 350000, 400000, 450000, 500000, 600000, 650000, 1000000];
 
-// --- АВТОРИЗАЦИЯ ---
+// --- АВТОРИЗАЦИЯ (ИСПРАВЛЕНА ОШИБКА С PERSISTENCE) ---
 $('authBtn').addEventListener('click', () => {
   const email = $('authEmail').value.trim();
   const password = $('authPassword').value;
+  const remember = $('rememberMe').checked;
   const errorEl = $('authError');
   errorEl.style.display = 'none';
 
@@ -468,13 +518,31 @@ $('authBtn').addEventListener('click', () => {
     return;
   }
 
-  if (isRegisterMode) {
-    auth.createUserWithEmailAndPassword(email, password)
-      .catch(err => { errorEl.textContent = "Ошибка: " + err.message; errorEl.style.display = 'block'; });
-  } else {
-    auth.signInWithEmailAndPassword(email, password)
-      .catch(err => { errorEl.textContent = "Неверная почта или пароль."; errorEl.style.display = 'block'; });
-  }
+  const persistence = remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
+
+  auth.setPersistence(persistence).then(() => {
+      if (isRegisterMode) {
+        auth.createUserWithEmailAndPassword(email, password)
+          .catch(err => { errorEl.textContent = "Ошибка: " + err.message; errorEl.style.display = 'block'; });
+      } else {
+        auth.signInWithEmailAndPassword(email, password)
+          .catch(err => { errorEl.textContent = "Неверная почта или пароль."; errorEl.style.display = 'block'; });
+      }
+  }).catch(err => {
+      // Если окружение не поддерживает сохранение (например, Safari в инкогнито)
+      console.warn("Persistence error, falling back to NONE:", err);
+      auth.setPersistence(firebase.auth.Auth.Persistence.NONE).then(() => {
+          if (isRegisterMode) {
+            auth.createUserWithEmailAndPassword(email, password)
+              .catch(err2 => { errorEl.textContent = "Ошибка: " + err2.message; errorEl.style.display = 'block'; });
+          } else {
+            auth.signInWithEmailAndPassword(email, password)
+              .catch(err2 => { errorEl.textContent = "Неверная почта или пароль."; errorEl.style.display = 'block'; });
+          }
+      }).catch(err2 => {
+          errorEl.textContent = "Ошибка системы: " + err2.message; errorEl.style.display = 'block';
+      });
+  });
 });
 
 $('authSwitchBtn').addEventListener('click', () => {
@@ -500,13 +568,13 @@ $('resetPassBtn').addEventListener('click', () => {
   const errorEl = $('authError');
   errorEl.style.display = 'none';
   if (!email) {
-    errorEl.textContent = 'Введите вашу почту.';
+    errorEl.textContent = 'Введите вашу почту для сброса.';
     errorEl.style.display = 'block';
     return;
   }
   auth.sendPasswordResetEmail(email)
     .then(() => {
-      errorEl.style.color = '#37d67a';
+      errorEl.style.color = 'var(--green)';
       errorEl.textContent = 'Ссылка для сброса пароля отправлена на почту!';
       errorEl.style.display = 'block';
       setTimeout(() => { errorEl.style.color = 'crimson'; }, 5000);
@@ -539,7 +607,6 @@ auth.onAuthStateChanged(user => {
         objectsData = cloudData.objectsData || [];
         planData = cloudData.planData || {};
         
-        // МИГРАЦИЯ СТАРЫХ ДАННЫХ (числа -> объекты)
         for (let key in globalData) {
             if (Array.isArray(globalData[key])) {
                 globalData[key] = globalData[key].map(val => {
@@ -552,7 +619,7 @@ auth.onAuthStateChanged(user => {
       } else {
         globalData = {}; notesData = {}; dreamsData = []; objectsData = []; planData = {};
       }
-      updateInc(); updateCap(); renderDreams();
+      updateInc(); updateCap(); renderDreams(); renderSummary();
     });
 
   } else {
@@ -574,6 +641,25 @@ function saveAll() {
   }, 500); 
 }
 
+// --- НАВИГАЦИЯ ---
+function switchPage(pageId) {
+    document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); 
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
+    $('nav-'+pageId).classList.add('active'); 
+    $('page-'+pageId).classList.add('active');
+    
+    if (pageId === 'income') updateInc();
+    if (pageId === 'capital') updateCap();
+    if (pageId === 'dreams') renderDreams();
+    if (pageId === 'summary') renderSummary();
+}
+
+$('nav-income').addEventListener('click', () => switchPage('income'));
+$('nav-capital').addEventListener('click', () => switchPage('capital'));
+$('nav-dreams').addEventListener('click', () => switchPage('dreams'));
+$('nav-summary').addEventListener('click', () => switchPage('summary'));
+
+
 // --- ЛОГИКА РАБОТЫ ---
 function getMonthKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
 function getNoteKey(y, m, d) { return y + '-' + (m+1) + '-' + d; }
@@ -586,10 +672,6 @@ function getStatusClass(pct) {
   if (pct > 0) return 'status-dark-red';
   return '';
 }
-
-$('nav-income').addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); $('nav-income').classList.add('active'); $('page-income').classList.add('active'); updateInc(); });
-$('nav-capital').addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); $('nav-capital').classList.add('active'); $('page-capital').classList.add('active'); updateCap(); });
-$('nav-dreams').addEventListener('click', () => { document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); $('nav-dreams').classList.add('active'); $('page-dreams').classList.add('active'); renderDreams(); });
 
 // ДОХОД
 let incActiveLevel = 'plan'; 
@@ -642,7 +724,7 @@ function renderYearTilesInc() {
             yearSum += calculatePlanMonthTotal(y, m);
         } else {
             const monthArr = globalData[getMonthKey(new Date(y, m, 1))] || [];
-            yearSum += monthArr.reduce((a,b) => a + (b && b.saved ? b.saved : (typeof b === 'number' ? b : 0)), 0);
+            yearSum += getMonthSavedTotal(monthArr);
         }
     }
     let pct = 0; if (!isPlanMode && incActiveLevel > 0) pct = (yearSum / (incActiveLevel * 12)) * 100;
@@ -673,16 +755,16 @@ function initIncCalendar() {
       objectsData.forEach(obj => { options += `<option value="${obj}" ${dayData.obj === obj ? 'selected' : ''}>${obj}</option>`; });
       el.innerHTML = `<div class="dnum"><span>${day}</span><span>${dows[(new Date(y,m,day).getDay()+6)%7]}</span></div>
                       <select class="plan-select" data-day="${day-1}">${options}</select>
-                      <input type="text" inputmode="numeric" class="plan-amount" data-day="${day-1}" value="${formatNumber(dayData.amt)}" placeholder="0">`;
+                      <input type="text" inputmode="numeric" class="plan-amount ${dayData.amt > 0 ? 'input-filled' : ''}" data-day="${day-1}" value="${formatNumber(dayData.amt)}" placeholder="0">`;
     } else {
       const rawVal = monthData[day-1];
       const dayData = typeof rawVal === 'number' ? { income: 0, saved: rawVal } : (rawVal || { income: 0, saved: 0 });
       
       el.innerHTML = `<div class="dnum"><span>${day}</span><span>${dows[(new Date(y,m,day).getDay()+6)%7]}</span></div>
                       ${hasNote ? `<div class="note-icon" data-note="${noteKey}">${hasNote}</div>` : ''}
-                      <input type="text" inputmode="numeric" class="amount" data-type="income" data-day="${day-1}" value="${formatNumber(dayData.income)}" placeholder="Приход">
-                      <input type="text" inputmode="numeric" class="amount" data-type="saved" data-day="${day-1}" value="${formatNumber(dayData.saved)}" placeholder="Сохр.">
-                      <div class="note" data-note="${day-1}"></div>`;
+                      <input type="text" inputmode="numeric" class="amount ${dayData.income > 0 ? 'input-filled' : ''}" data-type="income" data-day="${day-1}" value="${formatNumber(dayData.income)}" placeholder="Приход">
+                      <input type="text" inputmode="numeric" class="amount ${dayData.saved > 0 ? 'input-filled' : ''}" data-type="saved" data-day="${day-1}" value="${formatNumber(dayData.saved)}" placeholder="Отлож.">
+                      <div class="note" data-day="${day-1}" data-key="${noteKey}" title="Нажмите, чтобы добавить комментарий"></div>`;
     }
     cal.appendChild(el);
   }
@@ -693,6 +775,10 @@ function initIncCalendar() {
         inp.addEventListener('input', (e) => { 
             let val = e.target.value.replace(/[^0-9]/g, '');
             e.target.value = val ? parseInt(val).toLocaleString('de-DE') : '';
+            
+            if (e.target.value) e.target.classList.add('input-filled');
+            else e.target.classList.remove('input-filled');
+
             const i = +e.target.dataset.day; if (!planData[key]) planData[key] = {}; if (!planData[key][i]) planData[key][i] = { obj: '', amt: '' }; planData[key][i].amt = parseNumber(e.target.value); saveAll(); refreshIncStats(); 
         }); 
     });
@@ -702,15 +788,25 @@ function initIncCalendar() {
             let val = e.target.value.replace(/[^0-9]/g, '');
             e.target.value = val ? parseInt(val).toLocaleString('de-DE') : '';
             
+            if (e.target.value) e.target.classList.add('input-filled');
+            else e.target.classList.remove('input-filled');
+
             const i = +e.target.dataset.day; 
             const type = e.target.dataset.type;
             if (!globalData[key]) globalData[key] = [];
             if (!globalData[key][i]) globalData[key][i] = { income: 0, saved: 0 };
+            if (typeof globalData[key][i] === 'number') globalData[key][i] = { income: 0, saved: globalData[key][i] };
             globalData[key][i][type] = parseNumber(e.target.value); 
-            saveAll(); refreshIncStats(); refreshCapStats(); 
+            saveAll(); refreshIncStats(); refreshCapStats(); renderSummary(); 
         }); 
     });
     cal.querySelectorAll('.note-icon').forEach(icon => { icon.addEventListener('click', (e) => { e.stopPropagation(); openNoteModal(icon.dataset.note); }); });
+    cal.querySelectorAll('.note').forEach(noteDiv => {
+        noteDiv.addEventListener('click', (e) => {
+            const key = e.target.dataset.key;
+            openNoteModal(key);
+        });
+    });
   }
   refreshIncStats(); 
 }
@@ -719,25 +815,55 @@ let currentNoteKey = null;
 function openNoteModal(key) {
   currentNoteKey = key; const parts = key.split('-'); const d = new Date(parts[0], parts[1]-1, parts[2]);
   $('modalDate').textContent = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-  const note = notesData[key] || {}; const sourceSelect = $('noteSource'); const customInput = $('noteCustomSource');
-  if (['Работа по объекту', 'Прибыль на материалах', 'Дизайн-проект', 'Мебель и комплектация'].includes(note.source)) { sourceSelect.value = note.source; customInput.style.display = 'none'; } else if (note.source) { sourceSelect.value = 'Другое'; customInput.value = note.source; customInput.style.display = 'block'; } else { sourceSelect.value = 'Работа по объекту'; customInput.style.display = 'none'; }
-  $('noteText').value = note.text || ''; $('noteModal').classList.add('active');
+  
+  const note = notesData[key] || {}; 
+  const sourceSelect = $('noteSource'); 
+  const customInput = $('noteCustomSource');
+  
+  sourceSelect.innerHTML = '<option value="Дополнительный доход">Дополнительный доход</option>';
+  objectsData.forEach(obj => {
+      sourceSelect.innerHTML += `<option value="${obj}">${obj}</option>`;
+  });
+  sourceSelect.innerHTML += '<option value="Другое">Другое (своё)</option>';
+
+  if (note.source) {
+      if (objectsData.includes(note.source) || note.source === 'Дополнительный доход') {
+          sourceSelect.value = note.source;
+          customInput.style.display = 'none';
+      } else {
+          sourceSelect.value = 'Другое';
+          customInput.value = note.source;
+          customInput.style.display = 'block';
+      }
+  } else {
+      sourceSelect.value = 'Дополнительный доход';
+      customInput.style.display = 'none';
+  }
+  
+  $('noteText').value = note.text || ''; 
+  $('noteModal').classList.add('active');
 }
 
 $('noteSource').addEventListener('change', (e) => { if (e.target.value === 'Другое') $('noteCustomSource').style.display = 'block'; else $('noteCustomSource').style.display = 'none'; });
 $('noteCancel').addEventListener('click', () => { $('noteModal').classList.remove('active'); currentNoteKey = null; });
 $('noteSave').addEventListener('click', () => {
-  if (!currentNoteKey) return; let source = $('noteSource').value; if (source === 'Другое') source = $('noteCustomSource').value.trim() || 'Другое'; const text = $('noteText').value.trim();
-  if (!text && !source) delete notesData[currentNoteKey]; else notesData[currentNoteKey] = { source, text };
-  saveAll(); $('noteModal').classList.remove('active'); currentNoteKey = null; initIncCalendar();
+  if (!currentNoteKey) return; 
+  let source = $('noteSource').value; 
+  if (source === 'Другое') source = $('noteCustomSource').value.trim() || 'Другое'; 
+  const text = $('noteText').value.trim();
+  
+  if (!text && !source) delete notesData[currentNoteKey]; 
+  else notesData[currentNoteKey] = { source, text };
+  
+  saveAll(); $('noteModal').classList.remove('active'); currentNoteKey = null; 
+  initIncCalendar(); renderSummary();
 });
 
 function refreshIncStats() {
   const y = incViewDate.getFullYear(), m = incViewDate.getMonth(), key = getMonthKey(incViewDate), daysInMonth = new Date(y, m + 1, 0).getDate();
   const monthData = globalData[key] || [];
   
-  // СУММА ФАКТА ТЕПЕРЬ СЧИТАЕТСЯ ТОЛЬКО ПО "ОТЛОЖЕНО" (saved)
-  const monthSum = monthData.reduce((a, b) => a + (b && b.saved ? b.saved : (typeof b === 'number' ? b : 0)), 0);
+  const monthSum = getMonthSavedTotal(monthData);
   
   const planSum = calculatePlanMonthTotal(y, m), isPlanMode = incActiveLevel === 'plan', incFactCard = $('incFactCard');
 
@@ -760,10 +886,24 @@ function refreshIncStats() {
     const v = typeof rawVal === 'object' && rawVal !== null ? (rawVal.saved || 0) : (typeof rawVal === 'number' ? rawVal : 0);
     
     parent.classList.remove('day-green', 'day-yellow', 'day-red');
-    if (v > 0 && planDay > 0) { const ratio = v / planDay; if (ratio >= 0.90) parent.classList.add('day-green'); else if (ratio >= 0.50) parent.classList.add('day-yellow'); else parent.classList.add('day-red'); note.textContent = 'внесено'; } else { note.textContent = ''; }
+    if (v > 0 && planDay > 0) { 
+        const ratio = v / planDay; 
+        if (ratio >= 0.90) parent.classList.add('day-green'); 
+        else if (ratio >= 0.50) parent.classList.add('day-yellow'); 
+        else parent.classList.add('day-red'); 
+        
+        if (note) note.textContent = 'внесено'; 
+    } else { 
+        if (note) note.textContent = ''; 
+    }
   }
 
-  let filledDays = 0; for (let i=0; i<daysInMonth; i++) { if (monthData[i] && monthData[i].saved > 0) filledDays++; }
+  let filledDays = 0; for (let i=0; i<daysInMonth; i++) {
+      const rawVal = monthData[i];
+      const v = typeof rawVal === 'object' && rawVal !== null ? (rawVal.saved || 0) : (typeof rawVal === 'number' ? rawVal : 0);
+      if (v > 0) filledDays++; 
+  }
+  
   const daysLeft = daysInMonth - filledDays;
   if (incActiveLevel === 0) {
     $('incTargetLabel').textContent = 'Текущая цель дохода'; $('incTarget').textContent = 'Факт'; $('incFactPct').textContent = 'Режим просмотра'; $('incStatus').textContent = '—'; $('incStatus').className = 'stat-val'; $('incForecast').innerHTML = 'Цель: режим просмотра.'; $('incLevelsList').innerHTML = '';
@@ -787,13 +927,13 @@ function renderQuarters() {
   const y = incViewDate.getFullYear(), planQ = incActiveLevel * 3;
   if (incActiveLevel === 0) { hint.style.display = 'none'; return; }
   for (let q = 0; q < 4; q++) {
-    let qSum = 0; for (let i = 0; i < 3; i++) { const m = q * 3 + i; const key = getMonthKey(new Date(y, m, 1)); const monthArr = globalData[key] || []; qSum += monthArr.reduce((a,b)=>a + (b && b.saved ? b.saved : (typeof b === 'number' ? b : 0)), 0); }
+    let qSum = 0; for (let i = 0; i < 3; i++) { const m = q * 3 + i; const key = getMonthKey(new Date(y, m, 1)); const monthArr = globalData[key] || []; qSum += getMonthSavedTotal(monthArr); }
     const pct = planQ > 0 ? (qSum / planQ) * 100 : 0;
     const el = document.createElement('div'); el.className = `q-tile ${getStatusClass(pct)}`; el.innerHTML = `<div class="q-name">Q${q+1}</div><div class="q-pct">${pct.toFixed(0)}%</div><div class="q-info">${shortMoney(qSum)}</div>`; grid.appendChild(el);
   }
-  let streak = 0; for (let q = 0; q < 4; q++) { let qSum = 0; for (let i = 0; i < 3; i++) { const m = q * 3 + i; const key = getMonthKey(new Date(y, m, 1)); const monthArr = globalData[key] || []; qSum += monthArr.reduce((a,b)=>a + (b && b.saved ? b.saved : (typeof b === 'number' ? b : 0)), 0); } const pct = planQ > 0 ? (qSum / planQ) * 100 : 0; if (pct >= 98) streak++; else streak = 0; }
+  let streak = 0; for (let q = 0; q < 4; q++) { let qSum = 0; for (let i = 0; i < 3; i++) { const m = q * 3 + i; const key = getMonthKey(new Date(y, m, 1)); const monthArr = globalData[key] || []; qSum += getMonthSavedTotal(monthArr); } const pct = planQ > 0 ? (qSum / planQ) * 100 : 0; if (pct >= 98) streak++; else streak = 0; }
   hint.style.display = 'block';
-  if (streak >= 3) { hint.style.background = 'rgba(55, 214, 122, 0.2)'; hint.style.color = '#37d67a'; hint.textContent = `🚀 Темп ${streak} кв. подряд! Пора на новый уровень.`; } else if (streak === 2) { hint.style.background = 'rgba(251, 191, 36, 0.2)'; hint.style.color = '#fbbf24'; hint.textContent = `🔥 2 квартала подряд! Ещё один — и новый уровень.`; } else if (streak === 1) { hint.style.background = 'rgba(79, 140, 255, 0.2)'; hint.style.color = 'var(--accent)'; hint.textContent = `✅ Один квартал закрыт. Держи темп ещё 2 квартала.`; } else { hint.style.background = 'rgba(255,255,255,0.05)'; hint.style.color = 'var(--muted)'; hint.textContent = `Закрой квартал (98%+), чтобы начать серию.`; }
+  if (streak >= 3) { hint.style.background = 'rgba(55, 214, 122, 0.2)'; hint.style.color = 'var(--green)'; hint.textContent = `🚀 Темп ${streak} кв. подряд! Пора на новый уровень.`; } else if (streak === 2) { hint.style.background = 'rgba(251, 191, 36, 0.2)'; hint.style.color = '#fbbf24'; hint.textContent = `🔥 2 квартала подряд! Ещё один — и новый уровень.`; } else if (streak === 1) { hint.style.background = 'rgba(79, 140, 255, 0.2)'; hint.style.color = 'var(--accent)'; hint.textContent = `✅ Один квартал закрыт. Держи темп ещё 2 квартала.`; } else { hint.style.background = 'rgba(255,255,255,0.05)'; hint.style.color = 'var(--muted)'; hint.textContent = `Закрой квартал (98%+), чтобы начать серию.`; }
 }
 
 function renderIncTiles() {
@@ -801,7 +941,7 @@ function renderIncTiles() {
   const y = incViewDate.getFullYear(), isPlanMode = incActiveLevel === 'plan';
   for (let m = 0; m < 12; m++) {
     const date = new Date(y, m, 1), key = getMonthKey(date), monthName = date.toLocaleString('ru-RU', { month: 'short' }), monthArr = globalData[key] || [];
-    const monthSum = monthArr.reduce((a,b) => a + (b && b.saved ? b.saved : (typeof b === 'number' ? b : 0)), 0);
+    const monthSum = getMonthSavedTotal(monthArr);
     const planSum = calculatePlanMonthTotal(y, m), isActive = (y === incViewDate.getFullYear() && m === incViewDate.getMonth());
     let pct = 0, pctText = '', displaySum = isPlanMode ? planSum : monthSum, isGolden = false;
     if (!isPlanMode) { isGolden = planSum > 0 && Math.abs(monthSum - planSum) < 1; if (incActiveLevel > 0) { pct = (monthSum / incActiveLevel) * 100; if (pct >= 98) pctText = `🏆 DONE`; else if (pct >= 75) pctText = `75%+`; else if (pct >= 50) pctText = `50%+`; else if (monthSum > 0) pctText = `<50%`; } }
@@ -826,7 +966,7 @@ function renderYearTilesCap() {
   const container = $('yearTilesCap'); container.innerHTML = '';
   const currentYear = capViewDate.getFullYear(), planMonth = GOAL_CAPITAL / (capActiveTerm * 12);
   for (let y = 2026; y <= 2035; y++) {
-    let yearSum = 0; for (let m = 0; m < 12; m++) { const key = getMonthKey(new Date(y, m, 1)); const monthArr = globalData[key] || []; yearSum += monthArr.reduce((a,b)=>a + (b && b.saved ? b.saved : (typeof b === 'number' ? b : 0)), 0); }
+    let yearSum = 0; for (let m = 0; m < 12; m++) { const key = getMonthKey(new Date(y, m, 1)); const monthArr = globalData[key] || []; yearSum += getMonthSavedTotal(monthArr); }
     const yearPlan = planMonth * 12; let pct = 0; if (planMonth > 0) pct = (yearSum / yearPlan) * 100;
     const el = document.createElement('div'); el.className = `year-tile ${getStatusClass(pct)} ${y === currentYear ? 'active' : ''}`; el.textContent = y; el.addEventListener('click', () => { capViewDate.setFullYear(y); updateCap(); }); container.appendChild(el);
   }
@@ -848,7 +988,7 @@ function initCapCalendar() {
     const dayData = typeof rawVal === 'number' ? { income: 0, saved: rawVal } : (rawVal || { income: 0, saved: 0 });
     
     el.innerHTML = `<div class="dnum"><span>${day}</span><span>${dows[(new Date(y,m,day).getDay()+6)%7]}</span></div>${hasNote ? `<div class="note-icon" data-note="${noteKey}">${hasNote}</div>` : ''}
-                    <input type="text" inputmode="numeric" class="amount" data-day="${day-1}" value="${formatNumber(dayData.saved)}" placeholder="0">
+                    <input type="text" inputmode="numeric" class="amount ${dayData.saved > 0 ? 'input-filled' : ''}" data-day="${day-1}" value="${formatNumber(dayData.saved)}" placeholder="0">
                     <div class="note" data-note="${day-1}"></div>`;
     cal.appendChild(el);
   }
@@ -856,12 +996,16 @@ function initCapCalendar() {
       inp.addEventListener('input', (e)=>{ 
           let val = e.target.value.replace(/[^0-9]/g, '');
           e.target.value = val ? parseInt(val).toLocaleString('de-DE') : '';
+          
+          if (e.target.value) e.target.classList.add('input-filled');
+          else e.target.classList.remove('input-filled');
+
           const i = +e.target.dataset.day; 
           if (!globalData[key]) globalData[key] = [];
           if (!globalData[key][i]) globalData[key][i] = { income: 0, saved: 0 };
           if (typeof globalData[key][i] === 'number') globalData[key][i] = { income: 0, saved: globalData[key][i] };
           globalData[key][i].saved = parseNumber(e.target.value); 
-          saveAll(); refreshCapStats(); refreshIncStats(); 
+          saveAll(); refreshCapStats(); refreshIncStats(); renderSummary();
       }); 
   });
   cal.querySelectorAll('.note-icon').forEach(icon => { icon.addEventListener('click', (e) => { e.stopPropagation(); openNoteModal(icon.dataset.note); }); });
@@ -871,7 +1015,7 @@ function initCapCalendar() {
 function refreshCapStats() {
   const y = capViewDate.getFullYear(), m = capViewDate.getMonth(), key = getMonthKey(capViewDate), daysInMonth = new Date(y, m + 1, 0).getDate();
   const monthData = globalData[key] || [];
-  const monthSum = monthData.reduce((a,b) => a + (b && b.saved ? b.saved : (typeof b === 'number' ? b : 0)), 0);
+  const monthSum = getMonthSavedTotal(monthData);
   
   const planMonth = GOAL_CAPITAL / (capActiveTerm * 12), planDay = planMonth / daysInMonth;
   for (let day=1; day<=daysInMonth; day++){
@@ -883,13 +1027,20 @@ function refreshCapStats() {
     parent.classList.remove('day-green', 'day-yellow', 'day-red');
     if (v > 0 && planDay > 0) { const ratio = v / planDay; if (ratio >= 0.90) parent.classList.add('day-green'); else if (ratio >= 0.50) parent.classList.add('day-yellow'); else parent.classList.add('day-red'); note.textContent = 'внесено'; } else { note.textContent = ''; }
   }
-  let filledDays = 0; for (let i=0; i<daysInMonth; i++) { if (monthData[i] && monthData[i].saved > 0) filledDays++; }
+  let filledDays = 0; for (let i=0; i<daysInMonth; i++) { 
+      const rawVal = monthData[i];
+      const v = typeof rawVal === 'object' && rawVal !== null ? (rawVal.saved || 0) : (typeof rawVal === 'number' ? rawVal : 0);
+      if (v > 0) filledDays++; 
+  }
+  
   const daysLeft = daysInMonth - filledDays, leftToClose = planMonth - monthSum;
   if (leftToClose > 0) { const perDay = daysLeft > 0 ? (leftToClose / daysLeft) : leftToClose; $('capForecast').innerHTML = `Внесено <b>${money(monthSum)}</b> за <b>${filledDays} дн.</b> · Осталось: <b>${money(leftToClose)}</b><br><span class="highlight">По ${money(perDay)} / день</span> на ${daysLeft} дн.`; } else { $('capForecast').innerHTML = `План месяца закрыт! (${money(monthSum)} из ${money(planMonth)}) 🎉`; }
   let lvlHtml = ''; TERMS.forEach(t => { const pm = GOAL_CAPITAL / (t * 12); const isActive = t === capActiveTerm ? 'active' : ''; const left = pm - monthSum; let perDay = 0; if (left > 0) perDay = daysLeft > 0 ? (left / daysLeft) : left; lvlHtml += `<div class="lvl-item ${isActive}"><div class="lvl-title">Срок ${t} лет</div><div class="lvl-val">${left > 0 ? money(perDay)+'/день' : 'Закрыто'}</div></div>`; });
   $('capLevelsList').innerHTML = lvlHtml;
   
-  let total = 0; Object.values(globalData).forEach(monthArr => { if(Array.isArray(monthArr)) { monthArr.forEach(d => { if (d) total += (d.saved || (typeof d === 'number' ? d : 0)); }); } });
+  let total = 0; Object.values(globalData).forEach(monthArr => { 
+      total += getMonthSavedTotal(monthArr);
+  });
   
   $('capGlobal').textContent = money(total); $('capTermLabel').textContent = `Срок: ${capActiveTerm} лет`; $('capPlanMonth').textContent = money(planMonth) + ' / мес';
   const pct = total / GOAL_CAPITAL; $('capPctBig').textContent = (pct * 100).toFixed(pct < 0.01 ? 4 : 2).replace('.', ',') + '%'; $('capPctDetails').innerHTML = `<b>${money(total)}</b> из 60 млн`; $('capBarfill').style.width = Math.max(0.5, Math.min(100, pct * 100)) + '%';
@@ -901,7 +1052,7 @@ function renderCapTiles() {
   const y = capViewDate.getFullYear(), planMonth = GOAL_CAPITAL / (capActiveTerm * 12);
   for (let m = 0; m < 12; m++) {
     const date = new Date(y, m, 1), key = getMonthKey(date), monthName = date.toLocaleString('ru-RU', { month: 'short' }), monthArr = globalData[key] || [];
-    const monthSum = monthArr.reduce((a,b) => a + (b && b.saved ? b.saved : (typeof b === 'number' ? b : 0)), 0);
+    const monthSum = getMonthSavedTotal(monthArr);
     const isActive = (y === capViewDate.getFullYear() && m === capViewDate.getMonth());
     let pct = 0, pctText = ''; if (planMonth > 0) { pct = (monthSum / planMonth) * 100; if (pct >= 98) pctText = `🏆 DONE`; else if (pct >= 75) pctText = `75%+`; else if (pct >= 50) pctText = `50%+`; else if (monthSum > 0) pctText = `<50%`; }
     const el = document.createElement('div'); el.className = `tile ${getStatusClass(pct)} ${isActive ? 'active' : ''}`;
@@ -918,7 +1069,10 @@ $('nextMonthCap').addEventListener('click', () => { capViewDate.setMonth(capView
 function renderDreams() {
   const list = $('dreamsList'); list.innerHTML = '';
   const autoDist = localStorage.getItem('autoDistribute') === 'true'; $('autoDistributeToggle').checked = autoDist;
-  let totalIncome = 0; Object.values(globalData).forEach(monthArr => { if(Array.isArray(monthArr)) { monthArr.forEach(d => { if (d) totalIncome += (d.saved || (typeof d === 'number' ? d : 0)); }); } });
+  let totalIncome = 0; 
+  Object.values(globalData).forEach(monthArr => { 
+      totalIncome += getMonthSavedTotal(monthArr);
+  });
   let totalCost = dreamsData.reduce((sum, d) => sum + (d.cost || 0), 0);
   if (dreamsData.length === 0) { list.innerHTML = '<div class="label" style="text-align:center; padding: 20px;">У тебя пока нет целей. Добавь первую!</div>'; return; }
   
@@ -926,7 +1080,7 @@ function renderDreams() {
     let savedAmount = dream.saved || 0; if (autoDist && totalCost > 0) { savedAmount = (dream.cost / totalCost) * totalIncome; }
     const pct = dream.cost > 0 ? (savedAmount / dream.cost) * 100 : 0; const visualPct = Math.min(100, pct); const isDone = pct >= 100;
     const el = document.createElement('div'); el.className = 'dream-card' + (isDone ? ' goal-complete' : '');
-    el.innerHTML = `<div class="dream-header"><div class="dream-title">${dream.name || 'Новая цель'} ${autoDist ? '<span style="font-size:10px; color:var(--accent); border:1px solid var(--accent); padding:2px 4px; border-radius:4px; margin-left:6px; vertical-align:middle;">Авто</span>' : ''}</div><button class="dream-delete" data-index="${index}">Удалить</button></div><div class="dream-amounts"><div class="dream-pct-large">${pct.toFixed(1)}%</div><div class="dream-cost">Цель: ${shortMoney(dream.cost)} ₽</div></div><div class="dream-bar-container"><div class="dream-bar-fill" style="width: ${visualPct}%;"></div></div><div class="dream-input-wrap"><span>Отложено:</span><input type="text" inputmode="numeric" class="dream-input" data-index="${index}" value="${formatNumber(savedAmount)}" placeholder="0" ${autoDist ? 'disabled' : ''}><span>₽</span></div>`;
+    el.innerHTML = `<div class="dream-header"><div class="dream-title">${dream.name || 'Новая цель'} ${autoDist ? '<span style="font-size:10px; color:var(--accent); border:1px solid var(--accent); padding:2px 4px; border-radius:4px; margin-left:6px; vertical-align:middle;">Авто</span>' : ''}</div><button class="dream-delete" data-index="${index}">Удалить</button></div><div class="dream-amounts"><div class="dream-pct-large">${pct.toFixed(1)}%</div><div class="dream-cost">Цель: ${shortMoney(dream.cost)} ₽</div></div><div class="dream-bar-container"><div class="dream-bar-fill" style="width: ${visualPct}%;"></div></div><div class="dream-input-wrap ${savedAmount > 0 ? 'input-filled' : ''}"><span>Отложено:</span><input type="text" inputmode="numeric" class="dream-input" data-index="${index}" value="${formatNumber(savedAmount)}" placeholder="0" ${autoDist ? 'disabled' : ''}><span>₽</span></div>`;
     list.appendChild(el);
   });
 
@@ -936,6 +1090,10 @@ function renderDreams() {
       let val = e.target.value.replace(/[^0-9]/g, '');
       e.target.value = val ? parseInt(val).toLocaleString('de-DE') : '';
       
+      const wrap = e.target.closest('.dream-input-wrap');
+      if (e.target.value) wrap.classList.add('input-filled');
+      else wrap.classList.remove('input-filled');
+
       const idx = +e.target.dataset.index; 
       const parsedVal = parseNumber(e.target.value);
       dreamsData[idx].saved = parsedVal; saveAll();
@@ -959,15 +1117,86 @@ $('addDreamBtn').addEventListener('click', () => {
     dreamsData.push({ name, cost, saved: 0 }); saveAll(); $('dreamName').value = ''; $('dreamCost').value = ''; renderDreams(); 
 });
 
-// Форматирование поля ввода стоимости цели
 $('dreamCost').addEventListener('input', (e) => {
     let val = e.target.value.replace(/[^0-9]/g, '');
     e.target.value = val ? parseInt(val).toLocaleString('de-DE') : '';
+    if (e.target.value) e.target.classList.add('input-filled'); else e.target.classList.remove('input-filled');
 });
+
+// СВОДНАЯ ТАБЛИЦА
+function renderSummary() {
+  const list = $('summaryList'); 
+  if(!list) return;
+  list.innerHTML = '';
+  
+  let history = [];
+  
+  for (let monthKey in globalData) {
+      const monthArr = globalData[monthKey];
+      if (!Array.isArray(monthArr)) continue;
+      
+      monthArr.forEach((dayData, index) => {
+          if (!dayData) return;
+          const income = dayData.income || (typeof dayData === 'number' ? dayData : 0);
+          const saved = dayData.saved || (typeof dayData === 'number' ? dayData : 0);
+          
+          if (income > 0 || saved > 0) {
+              const [year, month] = monthKey.split('-');
+              const day = String(index + 1).padStart(2, '0');
+              const fullDate = `${year}-${month}-${day}`;
+              
+              const note = notesData[fullDate] || {};
+              
+              history.push({
+                  date: fullDate,
+                  income: income,
+                  saved: saved,
+                  obj: note.source || '',
+                  comment: note.text || ''
+              });
+          }
+      });
+  }
+  
+  history.sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  if (history.length === 0) {
+      list.innerHTML = '<div class="label" style="text-align:center; padding: 20px;">Пока нет ни одной записи.</div>';
+      return;
+  }
+  
+  history.forEach(item => {
+      const d = new Date(item.date);
+      const dateStr = d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      
+      const el = document.createElement('div');
+      el.className = 'summary-item';
+      
+      let detailsHtml = '';
+      if (item.obj || item.comment) {
+          detailsHtml = `
+          <div class="sum-details">
+              ${item.obj ? `<div class="sum-obj">🏷️ ${item.obj}</div>` : ''}
+              ${item.comment ? `<div class="sum-comment">💬 ${item.comment}</div>` : ''}
+          </div>`;
+      }
+      
+      el.innerHTML = `
+          <div class="sum-header">
+              <div class="sum-date">📅 ${dateStr}</div>
+              <div>
+                  ${item.income > 0 ? `<span class="sum-amount">+${money(item.income)}</span>` : ''}
+                  ${item.saved > 0 ? `<span class="sum-saved">(отложено: ${money(item.saved)})</span>` : ''}
+              </div>
+          </div>
+          ${detailsHtml}
+      `;
+      list.appendChild(el);
+  });
+}
 
 // --- ЗАПУСК ---
 renderIncTabs(); initIncCalendar(); renderCapTabs(); initCapCalendar();
-
 </script>
 </body>
 </html>
