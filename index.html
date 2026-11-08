@@ -45,7 +45,6 @@
   .auth-link { display: block; margin-top: 16px; color: var(--muted); font-size: 14px; cursor: pointer; text-decoration: underline;}
   .auth-error { color: crimson; font-size: 13px; margin-top: 10px; display: none; }
   
-  /* ЧЕКБОКС ЗАПОМНИТЬ МЕНЯ */
   .remember-wrap { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-bottom: 12px; font-size: 14px; color: var(--muted); }
   .remember-wrap input { margin: 0; width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
 
@@ -236,16 +235,17 @@
   input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
   input:checked + .slider:before { transform: translateX(20px); background-color: #fff; }
 
-  /* СТИЛИ ДЛЯ СВОДНОЙ ТАБЛИЦЫ */
-  .summary-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-  .summary-item { background: var(--card2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
-  .sum-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 14px; }
-  .sum-date { color: var(--muted); font-size: 12px; }
-  .sum-amount { color: var(--green); font-size: 15px; }
-  .sum-saved { color: var(--accent); font-size: 12px; font-weight: normal;}
-  .sum-details { font-size: 12px; color: var(--text); background: rgba(255,255,255,0.03); padding: 6px; border-radius: 4px; margin-top: 4px;}
-  .sum-obj { color: var(--gold); font-weight: 600; margin-bottom: 2px;}
-  .sum-comment { font-style: italic; color: var(--muted); }
+  /* СТИЛИ ДЛЯ СВОДНОЙ ТАБЛИЦЫ (С ГРУППИРОВКОЙ) */
+  .summary-group { margin-bottom: 16px; background: var(--card2); border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+  .summary-group-header { background: rgba(255,255,255,0.05); padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; border-bottom: 1px solid var(--line); font-size: 15px; color: #fff; }
+  .summary-group-total { color: var(--green); font-size: 16px; }
+  .summary-group-body { padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; }
+  .summary-row { display: flex; justify-content: space-between; align-items: flex-start; font-size: 13px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 6px; margin-top: 4px;}
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row-date { color: var(--muted); font-size: 11px; margin-bottom: 2px;}
+  .summary-row-comment { color: var(--text); font-size: 12px; font-style: italic; opacity: 0.8;}
+  .summary-income-amt { color: var(--green); font-weight: bold; font-size: 14px; }
+  .summary-saved-amt { color: var(--accent); font-size: 11px; margin-top: 2px;}
 
   @media(max-width:850px){
     .calendar-layout { grid-template-columns: 1fr; }
@@ -418,8 +418,8 @@
 
     <div class="page" id="page-summary">
       <div class="card">
-        <div class="label">История поступлений (Сводная)</div>
-        <div class="summary-list" id="summaryList"></div>
+        <div class="label">Сводная по объектам</div>
+        <div id="summaryList"></div>
       </div>
     </div>
 
@@ -504,7 +504,7 @@ const GOAL_CAPITAL = 60000000;
 const TERMS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; 
 const INCOME_LEVELS = [0, 50000, 100000, 150000, 250000, 300000, 350000, 400000, 450000, 500000, 600000, 650000, 1000000];
 
-// --- АВТОРИЗАЦИЯ (ИСПРАВЛЕНА ОШИБКА С PERSISTENCE) ---
+// --- АВТОРИЗАЦИЯ ---
 $('authBtn').addEventListener('click', () => {
   const email = $('authEmail').value.trim();
   const password = $('authPassword').value;
@@ -529,7 +529,6 @@ $('authBtn').addEventListener('click', () => {
           .catch(err => { errorEl.textContent = "Неверная почта или пароль."; errorEl.style.display = 'block'; });
       }
   }).catch(err => {
-      // Если окружение не поддерживает сохранение (например, Safari в инкогнито)
       console.warn("Persistence error, falling back to NONE:", err);
       auth.setPersistence(firebase.auth.Auth.Persistence.NONE).then(() => {
           if (isRegisterMode) {
@@ -1123,14 +1122,22 @@ $('dreamCost').addEventListener('input', (e) => {
     if (e.target.value) e.target.classList.add('input-filled'); else e.target.classList.remove('input-filled');
 });
 
-// СВОДНАЯ ТАБЛИЦА
+// СВОДНАЯ ТАБЛИЦА (ГРУППИРОВКА ПО ОБЪЕКТАМ)
 function renderSummary() {
   const list = $('summaryList'); 
   if(!list) return;
   list.innerHTML = '';
-  
-  let history = [];
-  
+
+  let grouped = {};
+
+  // 1. Сначала регистрируем все существующие объекты
+  objectsData.forEach(obj => {
+      grouped[obj] = { income: 0, saved: 0, transactions: [] };
+  });
+  grouped['Дополнительный доход'] = { income: 0, saved: 0, transactions: [] };
+  grouped['Другое'] = { income: 0, saved: 0, transactions: [] };
+
+  // 2. Собираем все транзакции
   for (let monthKey in globalData) {
       const monthArr = globalData[monthKey];
       if (!Array.isArray(monthArr)) continue;
@@ -1146,52 +1153,86 @@ function renderSummary() {
               const fullDate = `${year}-${month}-${day}`;
               
               const note = notesData[fullDate] || {};
-              
-              history.push({
+              let objName = note.source || 'Без объекта';
+
+              // Если объект не из списка, но есть в заметках, добавляем его
+              if (!grouped[objName]) {
+                  grouped[objName] = { income: 0, saved: 0, transactions: [] };
+              }
+
+              grouped[objName].income += income;
+              grouped[objName].saved += saved;
+              grouped[objName].transactions.push({
                   date: fullDate,
                   income: income,
                   saved: saved,
-                  obj: note.source || '',
                   comment: note.text || ''
               });
           }
       });
   }
-  
-  history.sort((a, b) => new Date(b.date) - new Date(a.date));
-  
-  if (history.length === 0) {
-      list.innerHTML = '<div class="label" style="text-align:center; padding: 20px;">Пока нет ни одной записи.</div>';
+
+  // 3. Сортируем транзакции внутри каждой группы (сначала новые)
+  for (let key in grouped) {
+      grouped[key].transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+
+  let totalTx = 0;
+  Object.values(grouped).forEach(g => totalTx += g.transactions.length);
+  if (totalTx === 0) {
+      list.innerHTML = '<div class="label" style="text-align:center; padding: 20px;">Пока нет ни одной записи. Внесите приход в календаре и укажите объект.</div>';
       return;
   }
-  
-  history.forEach(item => {
-      const d = new Date(item.date);
-      const dateStr = d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  // 4. Рендерим. Сначала те, где есть деньги, потом пустые
+  let sortedKeys = Object.keys(grouped).sort((a, b) => {
+      const totalA = grouped[a].income + grouped[a].saved;
+      const totalB = grouped[b].income + grouped[b].saved;
+      return totalB - totalA;
+  });
+
+  sortedKeys.forEach(key => {
+      const group = grouped[key];
+      // Не показываем пустые объекты, если это не "Дополнительный доход"
+      if (group.transactions.length === 0 && key !== 'Дополнительный доход' && key !== 'Другое') return;
+
+      const totalSum = group.income + group.saved;
+
+      const groupEl = document.createElement('div');
+      groupEl.className = 'summary-group';
       
-      const el = document.createElement('div');
-      el.className = 'summary-item';
-      
-      let detailsHtml = '';
-      if (item.obj || item.comment) {
-          detailsHtml = `
-          <div class="sum-details">
-              ${item.obj ? `<div class="sum-obj">🏷️ ${item.obj}</div>` : ''}
-              ${item.comment ? `<div class="sum-comment">💬 ${item.comment}</div>` : ''}
-          </div>`;
-      }
-      
-      el.innerHTML = `
-          <div class="sum-header">
-              <div class="sum-date">📅 ${dateStr}</div>
-              <div>
-                  ${item.income > 0 ? `<span class="sum-amount">+${money(item.income)}</span>` : ''}
-                  ${item.saved > 0 ? `<span class="sum-saved">(отложено: ${money(item.saved)})</span>` : ''}
-              </div>
+      let headerHtml = `
+          <div class="summary-group-header">
+              <span>🏷️ ${key}</span>
+              <span class="summary-group-total">${money(totalSum)}</span>
           </div>
-          ${detailsHtml}
       `;
-      list.appendChild(el);
+
+      let bodyHtml = '<div class="summary-group-body">';
+      if (group.transactions.length === 0) {
+          bodyHtml += '<div class="summary-row" style="justify-content:center; color:var(--muted); font-size:12px;">Нет поступлений</div>';
+      } else {
+          group.transactions.forEach(tx => {
+              const d = new Date(tx.date);
+              const dateStr = d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' });
+              bodyHtml += `
+                  <div class="summary-row">
+                      <div>
+                          <div class="summary-row-date">📅 ${dateStr}</div>
+                          ${tx.comment ? `<div class="summary-row-comment">💬 ${tx.comment}</div>` : ''}
+                      </div>
+                      <div style="text-align:right;">
+                          ${tx.income > 0 ? `<div class="summary-income-amt">+${money(tx.income)}</div>` : ''}
+                          ${tx.saved > 0 ? `<div class="summary-saved-amt">(отложено: ${money(tx.saved)})</div>` : ''}
+                      </div>
+                  </div>
+              `;
+          });
+      }
+      bodyHtml += '</div>';
+
+      groupEl.innerHTML = headerHtml + bodyHtml;
+      list.appendChild(groupEl);
   });
 }
 
